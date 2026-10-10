@@ -1,0 +1,4 @@
+interface:
+  display_name: "Encuadre Production API"
+  short_description: "Connect safely to Encuadre production from cloud or local agents"
+  default_prompt: "Use $encuadre-production-api. In ChatGPT cloud, connect the Encuadre MCP server first; never request an API key or local environment variable."

@@ -1,9 +1,306 @@
+/* ═══════════════════════════════════════════════════════
+   Encuadre Prod. — Global Styles + Material Design 3 Expressive (M3E)
+   Dark Mode • Paleta y Animaciones Grupo Encuadre Chile
+   ═══════════════════════════════════════════════════════ */
+
 :root {
-  --font-display:
-    Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,
-    Segoe UI Symbol, Noto Color Emoji;
-  --font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
-  --font-rounded: 'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif;
-  --font-serif: Georgia, 'Times New Roman', serif;
+  /* ── Primary Colors ── */
+  --md-sys-color-primary: rgb(197 192 255);
+  --md-sys-color-surface-tint: rgb(197 192 255);
+  --md-sys-color-on-primary: rgb(45 41 96);
+  --md-sys-color-primary-container: rgb(68 64 120);
+  --md-sys-color-on-primary-container: rgb(227 223 255);
+
+  /* ── Secondary Colors ── */
+  --md-sys-color-secondary: rgb(199 196 220);
+  --md-sys-color-on-secondary: rgb(48 46 66);
+  --md-sys-color-secondary-container: rgb(70 69 89);
+  --md-sys-color-on-secondary-container: rgb(228 223 249);
+
+  /* ── Tertiary Colors ── */
+  --md-sys-color-tertiary: rgb(235 184 208);
+  --md-sys-color-on-tertiary: rgb(71 37 56);
+  --md-sys-color-tertiary-container: rgb(96 59 79);
+  --md-sys-color-on-tertiary-container: rgb(255 216 233);
+
+  /* ── Error Colors ── */
+  --md-sys-color-error: rgb(255 180 171);
+  --md-sys-color-on-error: rgb(105 0 5);
+  --md-sys-color-error-container: rgb(147 0 10);
+  --md-sys-color-on-error-container: rgb(255 218 214);
+
+  /* ── Surface / Background ── */
+  --md-sys-color-background: rgb(19 19 24);
+  --md-sys-color-on-background: rgb(229 225 233);
+  --md-sys-color-surface: rgb(19 19 24);
+  --md-sys-color-on-surface: rgb(229 225 233);
+  --md-sys-color-surface-variant: rgb(71 70 79);
+  --md-sys-color-on-surface-variant: rgb(200 197 208);
+
+  /* ── Outline ── */
+  --md-sys-color-outline: rgb(146 143 153);
+  --md-sys-color-outline-variant: rgb(71 70 79);
+
+  /* ── Misc ── */
+  --md-sys-color-shadow: rgb(0 0 0);
+  --md-sys-color-scrim: rgb(0 0 0);
+
+  /* ── Inverse ── */
+  --md-sys-color-inverse-surface: rgb(229 225 233);
+  --md-sys-color-inverse-on-surface: rgb(49 48 54);
+  --md-sys-color-inverse-primary: rgb(92 88 145);
+
+  /* ── Fixed Colors ── */
+  --md-sys-color-primary-fixed: rgb(227 223 255);
+  --md-sys-color-on-primary-fixed: rgb(24 18 74);
+  --md-sys-color-primary-fixed-dim: rgb(197 192 255);
+  --md-sys-color-on-primary-fixed-variant: rgb(68 64 120);
+  --md-sys-color-secondary-fixed: rgb(228 223 249);
+  --md-sys-color-on-secondary-fixed: rgb(27 26 44);
+  --md-sys-color-secondary-fixed-dim: rgb(199 196 220);
+  --md-sys-color-on-secondary-fixed-variant: rgb(70 69 89);
+  --md-sys-color-tertiary-fixed: rgb(255 216 233);
+  --md-sys-color-on-tertiary-fixed: rgb(47 17 34);
+  --md-sys-color-tertiary-fixed-dim: rgb(235 184 208);
+  --md-sys-color-on-tertiary-fixed-variant: rgb(96 59 79);
+
+  /* ── Surface Containers (Elevación tonal MD3) ── */
+  --md-sys-color-surface-dim: rgb(19 19 24);
+  --md-sys-color-surface-bright: rgb(58 56 63);
+  --md-sys-color-surface-container-lowest: rgb(14 14 19);
+  --md-sys-color-surface-container-low: rgb(28 27 32);
+  --md-sys-color-surface-container: rgb(32 31 37);
+  --md-sys-color-surface-container-high: rgb(42 41 47);
+  --md-sys-color-surface-container-highest: rgb(53 52 58);
+
+  /* ── Semantic Extras ── */
+  --color-success: rgb(129 199 132);
+  --color-on-success: rgb(27 60 29);
+  --color-warning: rgb(255 213 79);
+  --color-on-warning: rgb(62 49 0);
+
+  /* ── MD3 Elevation Shadow Levels ── */
+  --shadow-level-0: none;
+  --shadow-level-1: 0 1px 3px 0 rgba(0, 0, 0, 0.25), 0 1px 2px -1px rgba(0, 0, 0, 0.2);
+  --shadow-level-2: 0 3px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.25);
+  --shadow-level-3: 0 8px 16px -2px rgba(0, 0, 0, 0.38), 0 4px 8px -2px rgba(0, 0, 0, 0.28);
+  --shadow-level-4: 0 14px 24px -3px rgba(0, 0, 0, 0.45), 0 6px 12px -3px rgba(0, 0, 0, 0.35);
+  --shadow-level-5: 0 22px 36px -4px rgba(0, 0, 0, 0.55), 0 10px 16px -4px rgba(0, 0, 0, 0.4);
+
+  /* ── MD3 Expressive Motion Curves ── */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-standard-decelerate: cubic-bezier(0, 0, 0, 1);
+  --ease-standard-accelerate: cubic-bezier(0.3, 0, 1, 1);
+
+  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-emphasized-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-spring-soft: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  /* ── Duration Tokens ── */
+  --duration-short-1: 50ms;
+  --duration-short-2: 100ms;
+  --duration-short-3: 150ms;
+  --duration-short-4: 200ms;
+  --duration-medium-1: 250ms;
+  --duration-medium-2: 300ms;
+  --duration-medium-3: 350ms;
+  --duration-medium-4: 400ms;
+  --duration-long-1: 450ms;
+  --duration-long-2: 500ms;
+
+  /* ── MD3 Shape Radii ── */
+  --radius-none: 0px;
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 28px;
+  --radius-full: 9999px;
+
+  /* ── MD3 Typography ── */
+  --md-sys-typescale-font: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --md-sys-typescale-font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+
+  /* ── Layout ── */
+  --content-max-width: 1200px;
+  --nav-rail-width: 80px;
+  --nav-rail-expanded-width: 256px;
+  --top-bar-height: 64px;
+  --bottom-nav-height: 80px;
+}
+
+/* ── Reset & Base ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: var(--md-sys-typescale-font);
+  color: var(--md-sys-color-on-surface);
+  background-color: var(--md-sys-color-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--md-sys-color-background);
+  color: var(--md-sys-color-on-surface);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* ── Links & Microinteractions ── */
+a {
+  color: var(--md-sys-color-primary);
+  text-decoration: none;
+  transition: color var(--duration-short-4) var(--ease-standard);
+}
+a:hover {
+  color: var(--md-sys-color-primary-fixed);
+}
+
+::selection {
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+
+/* ── Scrollbar Moderno MD3 ── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--md-sys-color-outline-variant);
+  border-radius: var(--radius-full);
+  transition: background var(--duration-short-4) var(--ease-standard);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--md-sys-color-outline);
+}
+
+/* ── Focus Visible Accesible ── */
+:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   M3 EXPRESSIVE GLOBAL UTILITY CLASSES & KEYFRAMES (Web Enhancements)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Animación de entrada suave para modales y diálogos */
+@keyframes m3e-dialog-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes m3e-backdrop-fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes m3e-fade-slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Diálogos y Modales con Spring In y Backdrop Blur */
+.m3e-modal-backdrop {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: m3e-backdrop-fade-in var(--duration-short-4) var(--ease-standard) forwards;
+}
+
+.m3e-dialog-card {
+  animation: m3e-dialog-in var(--duration-medium-3) var(--ease-spring) forwards;
+  box-shadow: var(--shadow-level-4);
+}
+
+/* Transición suave para cards interactivas */
+.m3e-card-interactive {
+  transition: transform var(--duration-medium-2) var(--ease-spring),
+              box-shadow var(--duration-short-4) var(--ease-standard),
+              border-color var(--duration-short-4) var(--ease-standard) !important;
+}
+
+.m3e-card-interactive:hover {
+  transform: translateY(-3px) scale(1.006) !important;
+  box-shadow: var(--shadow-level-3) !important;
+  border-color: rgba(197, 192, 255, 0.4) !important;
+}
+
+.m3e-card-interactive:active {
+  transform: scale(0.98) !important;
+  box-shadow: var(--shadow-level-1) !important;
+}
+
+/* Botones con rebote y efecto halo */
+.m3e-button-interactive {
+  transition: transform var(--duration-medium-2) var(--ease-spring),
+              box-shadow var(--duration-short-4) var(--ease-standard),
+              filter var(--duration-short-4) var(--ease-standard) !important;
+}
+
+.m3e-button-interactive:hover {
+  transform: scale(1.03) !important;
+  box-shadow: var(--shadow-level-2) !important;
+  filter: brightness(1.08) !important;
+}
+
+.m3e-button-interactive:active {
+  transform: scale(0.95) !important;
+  box-shadow: var(--shadow-level-1) !important;
+}
+
+/* Chips y Pestañas interactivas */
+.m3e-chip-interactive {
+  transition: transform var(--duration-short-4) var(--ease-spring),
+              background-color var(--duration-short-4) var(--ease-standard),
+              border-color var(--duration-short-4) var(--ease-standard) !important;
+}
+
+.m3e-chip-interactive:hover {
+  transform: translateY(-1px) scale(1.02) !important;
+}
+
+.m3e-chip-interactive:active {
+  transform: scale(0.96) !important;
+}
+
+/* ── Material Community Icons Font ── */
+@font-face {
+  font-family: "MaterialCommunityIcons";
+  src: url("/fonts/MaterialCommunityIcons.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
 }

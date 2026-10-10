@@ -1,0 +1,23 @@
+{
+  "name": "encuadre-api",
+  "version": "0.1.0",
+  "description": "Acceso seguro a la API REST del Portal de Producción de Encuadre.",
+  "author": {
+    "name": "Encuadre"
+  },
+  "skills": "./skills/",
+  "keywords": ["encuadre", "produccion", "api", "chatgpt", "mobile"],
+  "interface": {
+    "displayName": "Encuadre Production API",
+    "shortDescription": "Usa la API de producción de Encuadre de forma segura.",
+    "longDescription": "Consulta y modifica proyectos, contactos y personas del Portal de Producción de Encuadre usando exclusivamente la API REST desplegada, con autenticación, autorización reciente, soft delete y auditoría.",
+    "developerName": "Encuadre",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "defaultPrompt": [
+      "Consulta proyectos en el Portal de Producción.",
+      "Busca un contacto en Encuadre.",
+      "Actualiza un proyecto con autorización reciente."
+    ]
+  }
+}

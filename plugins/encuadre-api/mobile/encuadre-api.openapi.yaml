@@ -1,0 +1,167 @@
+openapi: 3.1.0
+info:
+  title: Encuadre Production API
+  version: 2.0.0
+  description: >-
+    API con conexión temporal aprobada por Clerk. No configures API keys ni
+    secretos persistentes. El cliente debe conservar la sesión temporal entre
+    llamadas y nunca mostrar secretos de canje ni sesiones al usuario.
+servers:
+  - url: https://prod.encuadre.muxp.art/api
+paths:
+  /auth/connect:
+    post:
+      operationId: startConnection
+      summary: Iniciar conexión de agente
+      description: Crea un enlace temporal. Muestra únicamente authUrl al usuario y conserva requestId y exchangeSecret como estado privado.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                clientName: { type: string }
+      responses:
+        '201':
+          description: Enlace de conexión creado
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DataResponse' }
+  /auth/connect/{requestId}/exchange:
+    post:
+      operationId: exchangeConnection
+      summary: Canjear conexión aprobada
+      description: Usa el secreto privado recibido desde startConnection. Puede responder CONNECTION_PENDING mientras el usuario no apruebe el enlace.
+      parameters:
+        - { name: requestId, in: path, required: true, schema: { type: string } }
+        - { name: X-Connection-Secret, in: header, required: true, schema: { type: string }, description: Secreto temporal privado; no mostrar al usuario. }
+      responses:
+        '200':
+          description: Sesión temporal emitida
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DataResponse' }
+  /projects:
+    get:
+      operationId: listProjects
+      summary: Listar proyectos
+      parameters:
+        - { $ref: '#/components/parameters/ApiSession' }
+        - { name: search, in: query, required: false, schema: { type: string } }
+        - { name: includeArchived, in: query, required: false, schema: { type: boolean, default: false } }
+      responses:
+        '200': { description: Proyectos, content: { application/json: { schema: { $ref: '#/components/schemas/DataResponse' } } } }
+    post:
+      operationId: createProject
+      summary: Crear proyecto
+      parameters:
+        - { $ref: '#/components/parameters/ApiSession' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProjectInput' }
+      responses:
+        '201': { description: Proyecto creado, content: { application/json: { schema: { $ref: '#/components/schemas/DataResponse' } } } }
+  /projects/{id}:
+    get:
+      operationId: getProject
+      summary: Obtener proyecto
+      parameters:
+        - { $ref: '#/components/parameters/ApiSession' }
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Proyecto, content: { application/json: { schema: { $ref: '#/components/schemas/DataResponse' } } } }
+  /projects/{id}/context:
+    get:
+      operationId: getProjectContext
+      summary: Obtener contexto de producción
+      parameters:
+        - { $ref: '#/components/parameters/ApiSession' }
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Contexto, content: { application/json: { schema: { $ref: '#/components/schemas/DataResponse' } } } }
+  /contacts:
+    get:
+      operationId: listContacts
+      summary: Buscar contactos
+      parameters:
+        - { $ref: '#/components/parameters/ApiSession' }
+        - { name: search, in: query, required: false, schema: { type: string } }
+      responses:
+        '200': { description: Contactos, content: { application/json: { schema: { $ref: '#/components/schemas/DataResponse' } } } }
+    post:
+      operationId: createContact
+      summary: Crear contacto
+      parameters:
+        - { $ref: '#/components/parameters/ApiSession' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ContactInput' }
+      responses:
+        '201': { description: Contacto creado, content: { application/json: { schema: { $ref: '#/components/schemas/DataResponse' } } } }
+  /contacts/{id}:
+    get:
+      operationId: getContact
+      summary: Obtener contacto
+      parameters:
+        - { $ref: '#/components/parameters/ApiSession' }
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Contacto, content: { application/json: { schema: { $ref: '#/components/schemas/DataResponse' } } } }
+components:
+  parameters:
+    ApiSession:
+      name: X-Encuadre-Session
+      in: header
+      required: true
+      description: Sesión temporal emitida tras aprobar y canjear una conexión. Nunca configurar como secreto permanente.
+      schema: { type: string }
+  schemas:
+    DataResponse:
+      type: object
+      required: [data]
+      properties:
+        data: {}
+    ProjectInput:
+      type: object
+      additionalProperties: false
+      required: [name, type, startDate, responsibleId]
+      properties:
+        name: { type: string }
+        description: { type: string }
+        type: { type: string }
+        status: { type: string }
+        startDate: { type: string, format: date-time }
+        endDate: { type: string, format: date-time }
+        coverImage: { type: string, format: uri }
+        responsibleId: { type: string }
+        templateId: { type: string }
+        tags: { type: array, items: { type: string } }
+        metadata: { type: object, additionalProperties: true }
+        driveFolderId: { type: string }
+    ContactInput:
+      type: object
+      additionalProperties: false
+      required: [name, category, role, department]
+      properties:
+        name: { type: string }
+        category: { type: string, enum: [actor, crew] }
+        role: { type: string }
+        department: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string }
+        whatsapp: { type: string }
+        instagram: { type: string }
+        avatarUrl: { type: string, format: uri }
+        agency: { type: string }
+        notes: { type: string }
+        portfolioUrl: { type: string, format: uri }
+        ratePerDay: { type: string }
+        availability: { type: string, enum: [available, busy, favorite, inactive] }
+        tags: { type: array, items: { type: string } }
+        actorDetails: { type: object, additionalProperties: true }

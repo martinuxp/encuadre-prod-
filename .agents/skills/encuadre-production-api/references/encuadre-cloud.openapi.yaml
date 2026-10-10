@@ -1,0 +1,81 @@
+openapi: 3.1.0
+info:
+  title: Encuadre Production API
+  version: 2.0.0
+  description: >-
+    API de Producción de Encuadre para agentes cloud. No configura API keys:
+    el usuario autoriza cada conversación mediante un enlace Clerk temporal.
+servers:
+  - url: https://prod.encuadre.muxp.art/api
+paths:
+  /auth/connect:
+    post:
+      operationId: startEncuadreConnection
+      summary: Iniciar conexión con Producción de Encuadre
+      description: Conserva requestId y exchangeSecret como estado privado. Muestra únicamente authUrl al usuario.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                clientName: { type: string }
+      responses:
+        '201': { description: Solicitud de conexión creada }
+  /auth/connect/{requestId}/exchange:
+    post:
+      operationId: exchangeEncuadreConnection
+      summary: Canjear conexión aprobada
+      description: Requiere el secreto privado recibido al iniciar la conexión. No lo muestres al usuario.
+      parameters:
+        - { name: requestId, in: path, required: true, schema: { type: string } }
+        - { name: X-Connection-Secret, in: header, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Sesión temporal emitida }
+  /contacts:
+    get:
+      operationId: listEncuadreContacts
+      summary: Listar o buscar contactos
+      parameters:
+        - { $ref: '#/components/parameters/ApiSession' }
+        - { name: search, in: query, required: false, schema: { type: string } }
+      responses:
+        '200': { description: Contactos encontrados }
+  /contacts/{id}:
+    get:
+      operationId: getEncuadreContact
+      summary: Obtener contacto
+      parameters:
+        - { $ref: '#/components/parameters/ApiSession' }
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Contacto encontrado }
+  /projects:
+    get:
+      operationId: listEncuadreProjects
+      summary: Listar o buscar proyectos
+      parameters:
+        - { $ref: '#/components/parameters/ApiSession' }
+        - { name: search, in: query, required: false, schema: { type: string } }
+        - { name: includeArchived, in: query, required: false, schema: { type: boolean } }
+      responses:
+        '200': { description: Proyectos encontrados }
+  /projects/{id}/context:
+    get:
+      operationId: getEncuadreProjectContext
+      summary: Obtener contexto de un proyecto
+      parameters:
+        - { $ref: '#/components/parameters/ApiSession' }
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Contexto del proyecto }
+components:
+  parameters:
+    ApiSession:
+      name: X-Encuadre-Session
+      in: header
+      required: true
+      description: Sesión temporal privada emitida después de aprobar la conexión.
+      schema: { type: string }

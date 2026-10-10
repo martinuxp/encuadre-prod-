@@ -1,0 +1,29 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Función para validar si el usuario es administrador
+    function isAdmin() {
+      return request.auth != null && 
+        (request.auth.token.role == 'admin' || 
+         request.auth.token.role == 'superadmin' || 
+         request.auth.token.role == 'producer');
+    }
+
+    // Reglas para archivos del proyecto
+    match /projects/{projectId}/{allPaths=**} {
+      // Solo admins pueden subir y borrar archivos del proyecto (guiones, PDFs, fotos)
+      allow write, delete: if request.auth != null;
+      
+      // Permitir descargas públicas (lectura) para participantes autorizados
+      // (ej. descarga del guión desde el link individual)
+      allow read: if true;
+    }
+    
+    // Reglas generales de marca o assets subidos
+    match /branding/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+  }
+}

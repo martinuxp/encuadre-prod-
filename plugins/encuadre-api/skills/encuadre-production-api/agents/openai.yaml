@@ -1,0 +1,4 @@
+interface:
+  display_name: "Encuadre Production API"
+  short_description: "Usa la API de producción de Encuadre de forma segura"
+  default_prompt: "Usa $encuadre-production-api para operar de forma segura la API de producción de Encuadre."

@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ═══════════════════════════════════════════════════════
+    // REGLAS TEMPORALES DE DESARROLLO — Encuadre Prod Portal
+    // Permite lectura y escritura libre para facilitar el desarrollo local.
+    // ⚠️ RECONFIGURAR ANTES DE DEPLEGAR A PRODUCCIÓN.
+    // ═══════════════════════════════════════════════════════
+
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

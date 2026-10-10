@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "encuadre": {
+      "type": "http",
+      "url": "https://prod.encuadre.muxp.art/mcp"
+    }
+  }
+}

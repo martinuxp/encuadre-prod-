@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "default": "encuadre-prod",
+    "production": "encuadre-prod"
+  }
+}

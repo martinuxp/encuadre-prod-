@@ -3,32 +3,48 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "dependencies": {
+    "@clerk/clerk-expo": "^2.19.31",
     "@expo/ui": "~57.0.4",
+    "@expo/vector-icons": "^15.1.1",
+    "@hookform/resolvers": "^5.4.0",
+    "date-fns": "^4.4.0",
     "expo": "~57.0.4",
     "expo-constants": "~57.0.3",
     "expo-device": "~57.0.0",
+    "expo-document-picker": "^57.0.0",
+    "expo-file-system": "^57.0.0",
     "expo-font": "~57.0.0",
     "expo-glass-effect": "~57.0.0",
     "expo-image": "~57.0.0",
+    "expo-image-picker": "^57.0.2",
     "expo-linking": "~57.0.2",
     "expo-router": "~57.0.4",
+    "expo-secure-store": "^57.0.0",
     "expo-splash-screen": "~57.0.2",
     "expo-status-bar": "~57.0.0",
     "expo-symbols": "~57.0.0",
     "expo-system-ui": "~57.0.0",
     "expo-web-browser": "~57.0.0",
+    "firebase": "^12.16.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-hook-form": "^7.81.0",
     "react-native": "0.86.0",
     "react-native-gesture-handler": "~2.32.0",
+    "react-native-paper": "^5.15.3",
     "react-native-reanimated": "4.5.0",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "4.25.2",
     "react-native-web": "~0.21.0",
-    "react-native-worklets": "0.10.0"
+    "react-native-worklets": "0.10.0",
+    "uuid": "^14.0.1",
+    "zod": "^4.4.3",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "eslint": "^9.0.0",
+    "eslint-config-expo": "~57.0.0",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -37,7 +53,10 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "build:web": "expo export --platform web && node -e \"const fs=require('fs');fs.mkdirSync('dist/fonts',{recursive:true});fs.copyFileSync('dist/assets/node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/MaterialCommunityIcons.6e435534bd35da5fef04168860a9b8fa.ttf','dist/fonts/MaterialCommunityIcons.ttf')\"",
+    "lint": "expo lint",
+    "deploy": "npm run build:web && firebase deploy --only hosting",
+    "deploy:full": "npm run build:web && firebase deploy"
   },
   "private": true
 }

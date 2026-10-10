@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "skills": {
+    "material-design-3-expressive": {
+      "source": "smithery.ai",
+      "sourceUrl": "https://smithery.ai/skills/nekorush14/material-design-3-expressive",
+      "sourceType": "well-known",
+      "computedHash": "f8aa1d98d16c1f1c6c64773a9fa833d48150326aae577acdabc83a252faefa97",
+      "wellKnownDigest": "sha256:6c2952204f807bc8d0d03404fd133515e31fc49d374307db76b10b3ef7d86b76"
+    }
+  }
+}
