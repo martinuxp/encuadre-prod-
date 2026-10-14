@@ -766,7 +766,8 @@ app.post('/api/projects/:id/scripts/:documentId/versions/:uploadId/commit', asyn
     const [exists] = await file.exists(); if (!exists) return error(res, 400, 'FILE_MISSING', `The ${key} file has not been uploaded.`);
     const [metadata] = await file.getMetadata(); const size = Number(metadata.size);
     if (!size || size > info.maxBytes) { await file.delete({ ignoreNotFound: true }); return error(res, 413, 'FILE_TOO_LARGE', `The ${key} file exceeds the allowed size.`); }
-    const token = crypto.randomUUID(); await file.setMetadata({ metadata: { firebaseStorageDownloadTokens: token } });
+    const fileName = String(upload.files[key].fileName || '').replace(/[^A-Za-z0-9._ ()-]/g, '_');
+    const token = crypto.randomUUID(); await file.setMetadata({ contentDisposition: `${key === 'pdf' ? 'inline' : 'attachment'}; filename="${fileName}"`, metadata: { firebaseStorageDownloadTokens: token } });
     stored[key] = { url: storageDownloadUrl(info.path, token), size };
   }
   const documentRef = db.doc(`projects/${projectId}/documents/${documentId}`); const versionRef = documentRef.collection('versions').doc();

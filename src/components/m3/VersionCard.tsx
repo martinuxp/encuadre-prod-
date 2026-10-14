@@ -19,6 +19,8 @@ interface VersionCardProps {
   isCurrent?: boolean;
   isLocked?: boolean;
   onDownload?: () => void;
+  /** Descarga del proyecto de Encuadre Script (.encdre), si la versión lo incluye */
+  onDownloadSource?: () => void;
   onLockToggle?: () => void;
   onRevert?: () => void;
   style?: ViewStyle;
@@ -33,6 +35,7 @@ export const VersionCard: React.FC<VersionCardProps> = ({
   isCurrent = false,
   isLocked = false,
   onDownload,
+  onDownloadSource,
   onLockToggle,
   onRevert,
   style,
@@ -106,6 +109,16 @@ export const VersionCard: React.FC<VersionCardProps> = ({
               variant="tonal"
               icon="file-pdf-box"
               onPress={onDownload}
+              style={styles.actionBtn}
+            />
+          )}
+
+          {onDownloadSource && (
+            <ActionButton
+              label="Descargar .encdre"
+              variant="outlined"
+              icon="script-text-outline"
+              onPress={onDownloadSource}
               style={styles.actionBtn}
             />
           )}

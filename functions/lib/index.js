@@ -1004,8 +1004,9 @@ app.post('/api/projects/:id/scripts/:documentId/versions/:uploadId/commit', asyn
             await file.delete({ ignoreNotFound: true });
             return error(res, 413, 'FILE_TOO_LARGE', `The ${key} file exceeds the allowed size.`);
         }
+        const fileName = String(upload.files[key].fileName || '').replace(/[^A-Za-z0-9._ ()-]/g, '_');
         const token = node_crypto_1.default.randomUUID();
-        await file.setMetadata({ metadata: { firebaseStorageDownloadTokens: token } });
+        await file.setMetadata({ contentDisposition: `${key === 'pdf' ? 'inline' : 'attachment'}; filename="${fileName}"`, metadata: { firebaseStorageDownloadTokens: token } });
         stored[key] = { url: storageDownloadUrl(info.path, token), size };
     }
     const documentRef = db.doc(`projects/${projectId}/documents/${documentId}`);

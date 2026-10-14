@@ -242,6 +242,10 @@ export interface ScriptVersion extends BaseEntity {
   fileUrl: string;
   fileSize: number;
   mimeType: string;
+  /** Archivo fuente de Encuadre Script (.encdre) publicado junto al PDF */
+  sourceFileUrl?: string;
+  sourceFileName?: string;
+  sourceFileSize?: number;
   isLocked: boolean;
   lockedBy?: string;
   lockedAt?: Date;

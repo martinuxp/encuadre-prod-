@@ -165,6 +165,9 @@ export default function DocumentsScreen() {
                   isCurrent={selectedDoc.currentVersionId === v.id}
                   isLocked={v.isLocked}
                   onDownload={() => { if (Platform.OS === 'web') window.open(v.fileUrl, '_blank'); }}
+                  onDownloadSource={v.sourceFileUrl
+                    ? () => { if (Platform.OS === 'web') window.open(v.sourceFileUrl, '_blank'); }
+                    : undefined}
                   onRevert={selectedDoc.currentVersionId !== v.id
                     ? () => documentService.revertToVersion(projectId, selectedDoc.id, v.id).then(() => fetchVersions(selectedDoc))
                     : undefined}
