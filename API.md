@@ -39,6 +39,36 @@ Todos los endpoints de datos requieren `X-Encuadre-Session`.
 | DELETE | `/api/projects/:id` | Soft delete, requiere grant |
 | DELETE | `/api/contacts/:id` | Soft delete, requiere grant |
 
+## Encuadre Script (app de escritorio)
+
+La app de escritorio usa el mismo flujo de conexión por enlace, enviando `{ "clientName": "Encuadre Script", "clientType": "desktop" }` en `POST /api/auth/connect`. La sesión resultante:
+
+- dura 30 días y se puede cerrar con `DELETE /api/auth/session`;
+- solo tiene los permisos `projects:read`, `scripts:read` y `scripts:write` (no puede leer contactos ni modificar o borrar proyectos);
+- publica versiones de guion sin aprobación adicional por operación, porque cada versión es aditiva y queda en `audit_logs`.
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/api/auth/connect/:id` | Datos públicos de la solicitud (cliente, tipo, estado) |
+| GET | `/api/auth/session` | Usuario, permisos y expiración de la sesión actual |
+| DELETE | `/api/auth/session` | Revoca la sesión actual |
+| GET | `/api/projects/:id/scripts` | Lista los guiones (documentos tipo `script`) |
+| POST | `/api/projects/:id/scripts` | Crea un guion `{ name, description?, tags? }` |
+| GET | `/api/projects/:id/scripts/:documentId/versions` | Historial de versiones |
+| POST | `/api/projects/:id/scripts/:documentId/versions` | Paso 1: reserva una versión y devuelve URLs de subida |
+| POST | `/api/projects/:id/scripts/:documentId/versions/:uploadId/commit` | Paso 2: valida los archivos y registra la versión |
+| GET | `/api/projects/:id/scripts/:documentId/versions/:versionId/download?file=pdf\|source` | Enlace de descarga temporal (15 min) |
+
+### Publicar una versión
+
+Cada versión lleva siempre dos archivos: el PDF (máx. 50 MB) y el proyecto `.encdre` (máx. 200 MB).
+
+1. `POST .../versions` con `{ "versionNumber"?: "2.0", "tag": "draft|review|approved|final", "notes": "", "pdf": { "fileName": "guion.pdf", "size": 123 }, "source": { "fileName": "guion.encdre", "size": 456 }, "appVersion"?: "0.8.4" }`.
+2. La respuesta trae `uploadId` y, para `pdf` y `source`, `{ uploadUrl, method: "PUT", headers }`. Hay que subir cada archivo con `PUT` enviando exactamente esos headers. Las URLs vencen en 15 minutos.
+3. `POST .../versions/:uploadId/commit` crea la versión. Si no se envió `versionNumber` se asigna `N.0` según el número de versiones existentes.
+
+La versión guarda `fileUrl` (PDF, compatible con el portal) y además `sourceFileUrl`, `sourceFileName`, `storagePath` y `sourceStoragePath`.
+
 ## Acciones sensibles
 
 Actualizaciones, asociaciones de personas, fotos y eliminaciones requieren una aprobación adicional por operación. La API devuelve `428 AUTH_REQUIRED` con un `authUrl`. El usuario debe abrirlo y confirmar con Clerk; el agente reintenta exactamente la misma operación con el `grantId` emitido. El grant vence en 30 minutos y se liga al usuario que abrió la conexión, recurso y método.

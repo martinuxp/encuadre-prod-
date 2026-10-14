@@ -27,6 +27,11 @@ const GRANT_TTL_MS = 30 * 60 * 1000;
 const REQUEST_TTL_MS = 10 * 60 * 1000;
 const CONNECTION_REQUEST_TTL_MS = 10 * 60 * 1000;
 const API_SESSION_TTL_MS = 30 * 60 * 1000;
+// Encuadre Script (app de escritorio): sesión larga, revocable y limitada a proyectos y guiones.
+const DESKTOP_SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+const SCRIPT_UPLOAD_TTL_MS = 15 * 60 * 1000;
+const SCRIPT_PDF_MAX_BYTES = 50 * 1024 * 1024;
+const SCRIPT_SOURCE_MAX_BYTES = 200 * 1024 * 1024;
 const MCP_ACCESS_TOKEN_TTL_MS = 30 * 60 * 1000;
 const MCP_AUTHORIZATION_CODE_TTL_MS = 60 * 1000;
 const MCP_URL = `${APP_URL}/mcp`;
@@ -40,9 +45,10 @@ const rateWindow = new Map<string, { startedAt: number; count: number }>();
 type Permission =
   | 'projects:read' | 'projects:create' | 'projects:update' | 'projects:delete'
   | 'contacts:read' | 'contacts:create' | 'contacts:update' | 'contacts:delete'
-  | 'files:read' | 'files:upload' | 'files:delete';
+  | 'files:read' | 'files:upload' | 'files:delete'
+  | 'scripts:read' | 'scripts:write';
 
-type Actor = { kind: 'clerk' | 'connection-session' | 'mcp'; id: string; permissions: Permission[]; email?: string };
+type Actor = { kind: 'clerk' | 'connection-session' | 'mcp'; id: string; permissions: Permission[]; email?: string; client?: 'agent' | 'desktop'; sessionHash?: string; sessionExpiresAt?: Date };
 type ApiRequest = Request & { actor?: Actor; grant?: { id: string; approvedBy: string; expiresAt: Date } };
 
 const error = (res: Response, status: number, code: string, message: string, extra: Record<string, unknown> = {}) =>
@@ -92,7 +98,9 @@ async function clerkActor(req: Request): Promise<Actor | null> {
 const apiPermissions: Permission[] = [
   'projects:read', 'contacts:read', 'files:read',
   'projects:create', 'projects:update', 'contacts:create', 'contacts:update', 'files:upload',
+  'scripts:read',
 ];
+const desktopPermissions: Permission[] = ['projects:read', 'scripts:read', 'scripts:write'];
 
 function hashOpaqueValue(value: string) {
   return crypto.createHash('sha256').update(value).digest('hex');
@@ -110,7 +118,8 @@ async function apiSessionActor(req: Request): Promise<Actor | null> {
   const data = snap.data();
   const expiresAt = data?.expiresAt as Timestamp | undefined;
   if (!snap.exists || !data || data.status !== 'active' || !expiresAt?.toDate || expiresAt.toDate() <= new Date()) return null;
-  return { kind: 'connection-session', id: String(data.userId), email: typeof data.email === 'string' ? data.email : undefined, permissions: apiPermissions };
+  const client = data.client === 'desktop' ? 'desktop' as const : 'agent' as const;
+  return { kind: 'connection-session', id: String(data.userId), email: typeof data.email === 'string' ? data.email : undefined, permissions: client === 'desktop' ? desktopPermissions : apiPermissions, client, sessionHash: snap.id, sessionExpiresAt: expiresAt.toDate() };
 }
 
 async function authenticate(req: ApiRequest, res: Response, next: NextFunction) {
@@ -584,15 +593,23 @@ app.delete('/api/contacts/:id', async (req: ApiRequest, res) => { const id = idS
 
 app.post('/api/auth/connect', async (req: Request, res) => {
   if (!CLERK_SECRET_KEY) return error(res, 503, 'AUTH_NOT_CONFIGURED', 'Clerk server authentication is not configured.');
-  const input = z.object({ clientName: z.string().trim().min(1).max(120).optional() }).strict().parse(req.body || {});
+  const input = z.object({ clientName: z.string().trim().min(1).max(120).optional(), clientType: z.enum(['agent', 'desktop']).default('agent') }).strict().parse(req.body || {});
   const requestId = crypto.randomBytes(24).toString('base64url');
   const exchangeSecret = `ecx1_${crypto.randomBytes(32).toString('base64url')}`;
   const expiresAt = new Date(Date.now() + CONNECTION_REQUEST_TTL_MS);
   await db.doc(`apiConnectionRequests/${requestId}`).set({
-    requestId, exchangeSecretHash: hashOpaqueValue(exchangeSecret), requestedClient: input.clientName || 'AI agent',
+    requestId, exchangeSecretHash: hashOpaqueValue(exchangeSecret), requestedClient: input.clientName || (input.clientType === 'desktop' ? 'Encuadre Script' : 'AI agent'), clientType: input.clientType,
     status: 'pending', createdAt: FieldValue.serverTimestamp(), expiresAt: Timestamp.fromDate(expiresAt),
   });
   res.status(201).json({ data: { requestId, exchangeSecret, authUrl: `${APP_URL}/auth/connect?request=${encodeURIComponent(requestId)}`, expiresAt: expiresAt.toISOString(), pollAfterSeconds: 2 } });
+});
+
+// Datos públicos de una solicitud para que la página de aprobación muestre qué se está autorizando.
+app.get('/api/auth/connect/:requestId', async (req: Request, res) => {
+  const requestId = idSchema.parse(req.params.requestId); const snap = await db.doc(`apiConnectionRequests/${requestId}`).get(); const request = snap.data();
+  if (!snap.exists || !request) return error(res, 404, 'NOT_FOUND', 'Connection request not found.');
+  const clientType = request.clientType === 'desktop' ? 'desktop' : 'agent';
+  res.json({ data: { clientName: String(request.requestedClient || ''), clientType, status: String(request.status), expiresAt: (request.expiresAt as Timestamp).toDate().toISOString(), sessionTtlSeconds: Math.floor((clientType === 'desktop' ? DESKTOP_SESSION_TTL_MS : API_SESSION_TTL_MS) / 1000) } });
 });
 
 app.post('/api/auth/connect/:requestId/approve', async (req: Request, res) => {
@@ -614,12 +631,12 @@ app.post('/api/auth/connect/:requestId/exchange', async (req: Request, res) => {
   if (!(request.expiresAt as Timestamp)?.toDate || (request.expiresAt as Timestamp).toDate() <= new Date()) return error(res, 400, 'CONNECTION_EXPIRED', 'The connection request has expired. Start a new connection.');
   if (request.status === 'pending') return error(res, 409, 'CONNECTION_PENDING', 'Waiting for the user to approve the connection.');
   if (request.status !== 'approved') return error(res, 400, 'CONNECTION_UNAVAILABLE', 'This connection request is no longer available.');
-  const sessionToken = `ecs1_${crypto.randomBytes(32).toString('base64url')}`; const sessionHash = hashOpaqueValue(sessionToken); const expiresAt = new Date(Date.now() + API_SESSION_TTL_MS);
+  const sessionToken = `ecs1_${crypto.randomBytes(32).toString('base64url')}`; const sessionHash = hashOpaqueValue(sessionToken); const isDesktop = request.clientType === 'desktop'; const sessionTtl = isDesktop ? DESKTOP_SESSION_TTL_MS : API_SESSION_TTL_MS; const expiresAt = new Date(Date.now() + sessionTtl);
   try {
     await db.runTransaction(async (transaction) => {
       const latest = await transaction.get(requestRef); const data = latest.data();
       if (!latest.exists || data?.status !== 'approved') throw new Error('CONNECTION_ALREADY_EXCHANGED');
-      transaction.create(db.doc(`apiSessions/${sessionHash}`), { status: 'active', userId: data.approvedBy, ...(data.approvedEmail ? { email: data.approvedEmail } : {}), permissions: apiPermissions, createdAt: FieldValue.serverTimestamp(), expiresAt: Timestamp.fromDate(expiresAt) });
+      transaction.create(db.doc(`apiSessions/${sessionHash}`), { status: 'active', userId: data.approvedBy, ...(data.approvedEmail ? { email: data.approvedEmail } : {}), permissions: isDesktop ? desktopPermissions : apiPermissions, client: isDesktop ? 'desktop' : 'agent', clientName: String(data.requestedClient || ''), createdAt: FieldValue.serverTimestamp(), expiresAt: Timestamp.fromDate(expiresAt) });
       transaction.update(requestRef, { status: 'exchanged', exchangedAt: FieldValue.serverTimestamp() });
     });
   } catch (err) {
@@ -627,7 +644,7 @@ app.post('/api/auth/connect/:requestId/exchange', async (req: Request, res) => {
     throw err;
   }
   await db.collection('audit_logs').add({ timestamp: FieldValue.serverTimestamp(), actor: 'agent-connection', authenticatedUser: String(request.approvedBy), action: 'api.connection.exchange', resourceId: requestId, changes: {} });
-  res.json({ data: { sessionToken, expiresAt: expiresAt.toISOString(), expiresInSeconds: Math.floor(API_SESSION_TTL_MS / 1000) } });
+  res.json({ data: { sessionToken, expiresAt: expiresAt.toISOString(), expiresInSeconds: Math.floor(sessionTtl / 1000) } });
 });
 
 app.post('/api/auth/agent/approve', async (req: ApiRequest, res) => {
@@ -641,6 +658,156 @@ app.post('/api/auth/agent/approve', async (req: ApiRequest, res) => {
 
 app.post('/api/contacts/:id/photo', async (req: ApiRequest, res: Response) => {
   const apiReq = req as ApiRequest; const id = idSchema.parse(req.params.id); if (!await requireRecentGrant(apiReq, res, 'contacts', id)) return; if (!await requirePermission(apiReq, res, 'files:upload')) return; const input = z.object({ contentBase64: z.string().max(6_500_000), mimeType: z.enum(['image/jpeg', 'image/png', 'image/webp']) }).strict().parse(req.body); const bytes = Buffer.from(input.contentBase64, 'base64'); if (bytes.length > 5 * 1024 * 1024) return error(res, 413, 'FILE_TOO_LARGE', 'Maximum photo size is 5 MB.'); const path = `contacts/${id}/avatar_${crypto.randomUUID()}`; const file = bucket.file(path); await file.save(bytes, { metadata: { contentType: input.mimeType } }); const [url] = await file.getSignedUrl({ action: 'read', expires: Date.now() + 15 * 60 * 1000 }); await db.doc(`contacts/${id}`).update({ avatarUrl: url, avatarStoragePath: path, updatedAt: FieldValue.serverTimestamp() }); await audit(apiReq, 'contact.photo.upload', id, { mimeType: input.mimeType, bytes: bytes.length }); res.status(201).json({ data: { url, expiresInSeconds: 900 } });
+});
+
+// ── Sesión actual (Encuadre Script) ──
+
+app.get('/api/auth/session', async (req: ApiRequest, res) => {
+  const actor = req.actor!;
+  res.json({ data: { userId: actor.id, email: actor.email || null, client: actor.client || 'agent', permissions: actor.permissions, expiresAt: actor.sessionExpiresAt?.toISOString() || null } });
+});
+
+app.delete('/api/auth/session', async (req: ApiRequest, res) => {
+  const actor = req.actor!;
+  if (!actor.sessionHash) return error(res, 400, 'INVALID_REQUEST', 'This credential is not an API session.');
+  await db.doc(`apiSessions/${actor.sessionHash}`).update({ status: 'revoked', revokedAt: FieldValue.serverTimestamp() });
+  await audit(req, 'api.session.revoke', actor.sessionHash.slice(0, 12));
+  res.json({ data: { revoked: true } });
+});
+
+// ── Guiones (documentos tipo "script" y sus versiones) ──
+// Cada versión publicada desde Encuadre Script lleva dos archivos: el PDF y el proyecto .encdre.
+// Los archivos se suben directo a Storage con URLs firmadas; la API solo valida y registra.
+
+const scriptCreate = z.object({ name: z.string().trim().min(1).max(200), description: z.string().max(5000).optional(), tags: z.array(z.string().max(80)).max(50).default([]) }).strict();
+const scriptFile = (maxBytes: number) => z.object({ fileName: z.string().trim().min(1).max(200), size: z.number().int().positive().max(maxBytes) }).strict();
+const scriptVersionBegin = z.object({
+  versionNumber: z.string().trim().min(1).max(40).optional(),
+  tag: z.enum(['draft', 'review', 'approved', 'final']).default('draft'),
+  notes: z.string().max(5000).default(''),
+  pdf: scriptFile(SCRIPT_PDF_MAX_BYTES),
+  source: scriptFile(SCRIPT_SOURCE_MAX_BYTES),
+  appVersion: z.string().max(60).optional(),
+}).strict();
+
+const safeFileName = (value: string) => value.replace(/[^A-Za-z0-9._ -]/g, '_').replace(/\s+/g, ' ').slice(0, 150);
+const storageDownloadUrl = (path: string, token: string) => `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(path)}?alt=media&token=${token}`;
+
+async function findProject(res: Response, projectId: string) {
+  const snap = await db.doc(`projects/${projectId}`).get();
+  if (!snap.exists || snap.data()?.deleted === true) { error(res, 404, 'NOT_FOUND', 'Project not found.'); return null; }
+  return snap;
+}
+
+async function findScript(res: Response, projectId: string, documentId: string) {
+  const snap = await db.doc(`projects/${projectId}/documents/${documentId}`).get(); const data = snap.data();
+  if (!snap.exists || !data || data.deleted === true || data.type !== 'script') { error(res, 404, 'NOT_FOUND', 'Script not found.'); return null; }
+  return snap;
+}
+
+app.get('/api/projects/:id/scripts', async (req: ApiRequest, res) => {
+  if (!await requirePermission(req, res, 'scripts:read')) return;
+  const projectId = idSchema.parse(req.params.id); if (!await findProject(res, projectId)) return;
+  const snap = await db.collection(`projects/${projectId}/documents`).where('type', '==', 'script').limit(200).get();
+  const rows = snap.docs.filter((d) => d.data().deleted !== true).map((d) => ({ id: d.id, ...docData(d.data()) }));
+  res.json({ data: rows });
+});
+
+app.post('/api/projects/:id/scripts', async (req: ApiRequest, res) => {
+  if (!await requirePermission(req, res, 'scripts:write')) return;
+  const projectId = idSchema.parse(req.params.id); if (!await findProject(res, projectId)) return;
+  const input = scriptCreate.parse(req.body); const ref = db.collection(`projects/${projectId}/documents`).doc(); const now = FieldValue.serverTimestamp();
+  await ref.set({ ...input, type: 'script', status: 'draft', projectId, currentVersionId: '', versions: [], createdAt: now, updatedAt: now, createdBy: req.actor!.id });
+  await audit(req, 'script.create', `${projectId}/documents/${ref.id}`, input);
+  res.status(201).json({ data: { id: ref.id } });
+});
+
+app.get('/api/projects/:id/scripts/:documentId/versions', async (req: ApiRequest, res) => {
+  if (!await requirePermission(req, res, 'scripts:read')) return;
+  const projectId = idSchema.parse(req.params.id); const documentId = idSchema.parse(req.params.documentId); if (!await findScript(res, projectId, documentId)) return;
+  const snap = await db.collection(`projects/${projectId}/documents/${documentId}/versions`).orderBy('createdAt', 'desc').limit(200).get();
+  res.json({ data: snap.docs.map((d) => ({ id: d.id, ...docData(d.data()) })) });
+});
+
+// Paso 1: reservar la versión y obtener las URLs de subida (PUT) para el PDF y el .encdre.
+app.post('/api/projects/:id/scripts/:documentId/versions', async (req: ApiRequest, res) => {
+  if (!await requirePermission(req, res, 'scripts:write')) return;
+  const projectId = idSchema.parse(req.params.id); const documentId = idSchema.parse(req.params.documentId); if (!await findScript(res, projectId, documentId)) return;
+  const input = scriptVersionBegin.parse(req.body);
+  if (!/\.pdf$/i.test(input.pdf.fileName)) return error(res, 400, 'VALIDATION_ERROR', 'The pdf file must have a .pdf extension.');
+  if (!/\.encdre$/i.test(input.source.fileName)) return error(res, 400, 'VALIDATION_ERROR', 'The source file must have a .encdre extension.');
+  const uploadId = crypto.randomBytes(18).toString('base64url'); const stamp = Date.now(); const base = `projects/${projectId}/documents/${documentId}`;
+  const expiresAt = new Date(stamp + SCRIPT_UPLOAD_TTL_MS);
+  const files = {
+    pdf: { path: `${base}/${stamp}_${safeFileName(input.pdf.fileName)}`, contentType: 'application/pdf', size: input.pdf.size, fileName: input.pdf.fileName, maxBytes: SCRIPT_PDF_MAX_BYTES },
+    source: { path: `${base}/${stamp}_${safeFileName(input.source.fileName)}`, contentType: 'application/octet-stream', size: input.source.size, fileName: input.source.fileName, maxBytes: SCRIPT_SOURCE_MAX_BYTES },
+  };
+  const sign = async (file: { path: string; contentType: string; maxBytes: number }) => {
+    const headers = { 'Content-Type': file.contentType, 'x-goog-content-length-range': `1,${file.maxBytes}` };
+    const [uploadUrl] = await bucket.file(file.path).getSignedUrl({ version: 'v4', action: 'write', expires: expiresAt, contentType: file.contentType, extensionHeaders: { 'x-goog-content-length-range': headers['x-goog-content-length-range'] } });
+    return { uploadUrl, method: 'PUT', headers };
+  };
+  const [pdf, source] = await Promise.all([sign(files.pdf), sign(files.source)]);
+  await db.doc(`scriptUploads/${uploadId}`).set({ projectId, documentId, requestedBy: req.actor!.id, status: 'pending', versionNumber: input.versionNumber || null, tag: input.tag, notes: input.notes, appVersion: input.appVersion || null, files, createdAt: FieldValue.serverTimestamp(), expiresAt: Timestamp.fromDate(expiresAt) });
+  res.status(201).json({ data: { uploadId, expiresAt: expiresAt.toISOString(), pdf, source } });
+});
+
+// Paso 2: confirmar que ambos archivos llegaron y registrar la versión.
+app.post('/api/projects/:id/scripts/:documentId/versions/:uploadId/commit', async (req: ApiRequest, res) => {
+  if (!await requirePermission(req, res, 'scripts:write')) return;
+  const projectId = idSchema.parse(req.params.id); const documentId = idSchema.parse(req.params.documentId); const uploadId = idSchema.parse(req.params.uploadId);
+  const uploadRef = db.doc(`scriptUploads/${uploadId}`); const uploadSnap = await uploadRef.get(); const upload = uploadSnap.data();
+  if (!uploadSnap.exists || !upload || upload.projectId !== projectId || upload.documentId !== documentId || upload.requestedBy !== req.actor!.id) return error(res, 404, 'NOT_FOUND', 'Upload not found.');
+  if (upload.status !== 'pending') return error(res, 409, 'UPLOAD_UNAVAILABLE', 'This upload was already committed.');
+  if ((upload.expiresAt as Timestamp).toDate() <= new Date()) return error(res, 400, 'UPLOAD_EXPIRED', 'The upload has expired. Start a new one.');
+  const stored: Record<'pdf' | 'source', { url: string; size: number }> = { pdf: { url: '', size: 0 }, source: { url: '', size: 0 } };
+  for (const key of ['pdf', 'source'] as const) {
+    const info = upload.files[key] as { path: string; maxBytes: number }; const file = bucket.file(info.path);
+    const [exists] = await file.exists(); if (!exists) return error(res, 400, 'FILE_MISSING', `The ${key} file has not been uploaded.`);
+    const [metadata] = await file.getMetadata(); const size = Number(metadata.size);
+    if (!size || size > info.maxBytes) { await file.delete({ ignoreNotFound: true }); return error(res, 413, 'FILE_TOO_LARGE', `The ${key} file exceeds the allowed size.`); }
+    const token = crypto.randomUUID(); await file.setMetadata({ metadata: { firebaseStorageDownloadTokens: token } });
+    stored[key] = { url: storageDownloadUrl(info.path, token), size };
+  }
+  const documentRef = db.doc(`projects/${projectId}/documents/${documentId}`); const versionRef = documentRef.collection('versions').doc();
+  let versionNumber = '';
+  try {
+    versionNumber = await db.runTransaction(async (transaction) => {
+      const [latestUpload, document] = await Promise.all([transaction.get(uploadRef), transaction.get(documentRef)]);
+      if (latestUpload.data()?.status !== 'pending') throw new Error('UPLOAD_ALREADY_COMMITTED');
+      const versions: string[] = Array.isArray(document.data()?.versions) ? document.data()!.versions : [];
+      const number = typeof upload.versionNumber === 'string' && upload.versionNumber ? upload.versionNumber : `${versions.length + 1}.0`;
+      const now = FieldValue.serverTimestamp();
+      transaction.set(versionRef, {
+        documentId, projectId, versionNumber: number, tag: upload.tag, notes: upload.notes,
+        fileUrl: stored.pdf.url, fileSize: stored.pdf.size, mimeType: 'application/pdf', storagePath: upload.files.pdf.path, fileName: upload.files.pdf.fileName,
+        sourceFileUrl: stored.source.url, sourceFileSize: stored.source.size, sourceStoragePath: upload.files.source.path, sourceFileName: upload.files.source.fileName,
+        isLocked: false, ...(document.data()?.currentVersionId ? { parentVersionId: document.data()!.currentVersionId } : {}),
+        createdAt: now, createdBy: req.actor!.id, metadata: { client: 'encuadre-script', ...(upload.appVersion ? { appVersion: upload.appVersion } : {}) },
+      });
+      transaction.update(documentRef, { currentVersionId: versionRef.id, versions: [...versions, versionRef.id], updatedAt: now });
+      transaction.update(uploadRef, { status: 'committed', versionId: versionRef.id, committedAt: now });
+      return number;
+    });
+  } catch (err) {
+    if (err instanceof Error && err.message === 'UPLOAD_ALREADY_COMMITTED') return error(res, 409, 'UPLOAD_UNAVAILABLE', 'This upload was already committed.');
+    throw err;
+  }
+  await audit(req, 'script.version.create', `${projectId}/documents/${documentId}/versions/${versionRef.id}`, { versionNumber, tag: upload.tag, pdfBytes: stored.pdf.size, sourceBytes: stored.source.size });
+  res.status(201).json({ data: { id: versionRef.id, versionNumber } });
+});
+
+// Enlace temporal de descarga del PDF o del .encdre de una versión.
+app.get('/api/projects/:id/scripts/:documentId/versions/:versionId/download', async (req: ApiRequest, res) => {
+  if (!await requirePermission(req, res, 'scripts:read')) return;
+  const projectId = idSchema.parse(req.params.id); const documentId = idSchema.parse(req.params.documentId); const versionId = idSchema.parse(req.params.versionId);
+  const kind = z.enum(['pdf', 'source']).default('pdf').parse(req.query.file); if (!await findScript(res, projectId, documentId)) return;
+  const snap = await db.doc(`projects/${projectId}/documents/${documentId}/versions/${versionId}`).get(); const version = snap.data();
+  if (!snap.exists || !version) return error(res, 404, 'NOT_FOUND', 'Version not found.');
+  const path = kind === 'pdf' ? version.storagePath : version.sourceStoragePath; const fileName = kind === 'pdf' ? version.fileName : version.sourceFileName;
+  if (typeof path !== 'string' || !path.startsWith(`projects/${projectId}/documents/${documentId}/`)) return error(res, 404, 'FILE_UNAVAILABLE', kind === 'source' ? 'This version has no Encuadre Script source file.' : 'This version was not uploaded through the API.', kind === 'pdf' && typeof version.fileUrl === 'string' ? { fileUrl: version.fileUrl } : {});
+  const [url] = await bucket.file(path).getSignedUrl({ version: 'v4', action: 'read', expires: Date.now() + 15 * 60 * 1000 });
+  res.json({ data: { url, fileName: typeof fileName === 'string' ? fileName : null, expiresInSeconds: 900 } });
 });
 
 app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => { if (err instanceof z.ZodError) return error(res, 400, 'VALIDATION_ERROR', 'Request validation failed.', { issues: err.issues }); console.error('[productionApi]', err); return error(res, 500, 'INTERNAL_ERROR', 'An unexpected server error occurred.'); });
