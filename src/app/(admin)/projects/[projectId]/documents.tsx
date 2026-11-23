@@ -186,12 +186,12 @@ export default function DocumentsScreen() {
             <Text style={styles.modalTitle}>Crear Documento</Text>
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Nombre *</Text>
-              <TextInput value={docName} onChangeText={setDocName} placeholder="Ej. Guión versión final" placeholderTextColor={colors.onSurfaceAlpha38} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
+              <TextInput accessibilityLabel="Nombre" value={docName} onChangeText={setDocName} placeholder="Ej. Guión versión final" placeholderTextColor={colors.placeholder} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
             </View>
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Tipo</Text>
               {Platform.OS === 'web' ? (
-                <select value={docType} onChange={(e) => setDocType(e.target.value as DocumentType)} style={{ height: 44, backgroundColor: colors.surfaceContainer, borderRadius: 8, padding: '0 16px', color: colors.onSurface, border: `1px solid ${colors.outlineVariant}`, outlineStyle: 'none' } as any}>
+                <select aria-label="Tipo" value={docType} onChange={(e) => setDocType(e.target.value as DocumentType)} style={{ height: 44, backgroundColor: colors.surfaceContainer, borderRadius: 8, padding: '0 16px', color: colors.onSurface, border: `1px solid ${colors.outlineVariant}`, outlineStyle: 'none' } as any}>
                   <option value="script">Guión</option>
                   <option value="storyboard">Storyboard</option>
                   <option value="shot_list">Lista de planos</option>
@@ -217,12 +217,12 @@ export default function DocumentsScreen() {
             <Text style={styles.modalTitle}>Subir Nueva Versión</Text>
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Número de versión *</Text>
-              <TextInput value={versionNumber} onChangeText={setVersionNumber} placeholder="Ej. 1.0, 2.3, FINAL" placeholderTextColor={colors.onSurfaceAlpha38} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
+              <TextInput accessibilityLabel="Número de versión" value={versionNumber} onChangeText={setVersionNumber} placeholder="Ej. 1.0, 2.3, FINAL" placeholderTextColor={colors.placeholder} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
             </View>
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Tag de estado</Text>
               {Platform.OS === 'web' && (
-                <select value={versionTag} onChange={(e) => setVersionTag(e.target.value as ScriptVersion['tag'])} style={{ height: 44, backgroundColor: colors.surfaceContainer, borderRadius: 8, padding: '0 16px', color: colors.onSurface, border: `1px solid ${colors.outlineVariant}` } as any}>
+                <select aria-label="Tag de estado" value={versionTag} onChange={(e) => setVersionTag(e.target.value as ScriptVersion['tag'])} style={{ height: 44, backgroundColor: colors.surfaceContainer, borderRadius: 8, padding: '0 16px', color: colors.onSurface, border: `1px solid ${colors.outlineVariant}` } as any}>
                   <option value="draft">Borrador</option>
                   <option value="review">En Revisión</option>
                   <option value="approved">Aprobado</option>
@@ -232,7 +232,7 @@ export default function DocumentsScreen() {
             </View>
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Notas de cambios</Text>
-              <TextInput value={versionNotes} onChangeText={setVersionNotes} placeholder="¿Qué cambió en esta versión?" placeholderTextColor={colors.onSurfaceAlpha38} multiline numberOfLines={3} style={[styles.input, styles.textarea, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
+              <TextInput accessibilityLabel="Notas de cambios" value={versionNotes} onChangeText={setVersionNotes} placeholder="¿Qué cambió en esta versión?" placeholderTextColor={colors.placeholder} multiline numberOfLines={3} style={[styles.input, styles.textarea, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
             </View>
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Archivo (PDF, DOC, etc.) *</Text>

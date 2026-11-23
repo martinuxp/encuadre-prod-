@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { Easing, Animated } from 'react-native';
+import { isReducedMotion } from '@/hooks/useReducedMotion';
 
 /**
  * Curvas de easing M3E.
@@ -19,9 +20,11 @@ export const ease = {
   emphasizedDecelerate: Easing.bezier(0.05, 0.7, 0.1, 1),
   emphasizedAccelerate: Easing.bezier(0.3, 0, 0.8, 0.15),
 
-  // Spring-like: overshoot expresivo orgánico de M3 Expressive
-  spring: Easing.bezier(0.34, 1.56, 0.64, 1),
-  springSoft: Easing.bezier(0.175, 0.885, 0.32, 1.275),
+  // Curva de la marca (salida suave, sin rebote): cubic-bezier(0.16, 1, 0.3, 1).
+  // `spring` y `springSoft` se conservan como nombres para no tocar cada llamada.
+  brand: Easing.bezier(0.16, 1, 0.3, 1),
+  spring: Easing.bezier(0.16, 1, 0.3, 1),
+  springSoft: Easing.bezier(0.16, 1, 0.3, 1),
 } as const;
 
 /** Duraciones M3E (ms) */
@@ -75,6 +78,7 @@ export function usePressAnimation(
   const scaleAnim = React.useRef(new Animated.Value(restScale)).current;
 
   const pressIn = () => {
+    if (isReducedMotion()) return;
     Animated.timing(scaleAnim, {
       toValue: pressedScale,
       duration: duration.short2,
@@ -84,6 +88,7 @@ export function usePressAnimation(
   };
 
   const pressOut = () => {
+    if (isReducedMotion()) { scaleAnim.setValue(restScale); return; }
     Animated.timing(scaleAnim, {
       toValue: restScale,
       duration: duration.medium2,
@@ -106,6 +111,12 @@ export function useEnterAnimation(
   const scale = React.useRef(new Animated.Value(fromScale)).current;
 
   React.useEffect(() => {
+    // Con "reducir movimiento" solo se hace un fundido corto, sin escala
+    if (isReducedMotion()) {
+      scale.setValue(1);
+      Animated.timing(opacity, { toValue: toOpacity, duration: duration.short4, useNativeDriver: true }).start();
+      return;
+    }
     Animated.parallel([
       Animated.timing(opacity, {
         toValue: toOpacity,
@@ -136,8 +147,9 @@ export function useModalSpringAnimation(visible: boolean) {
   React.useEffect(() => {
     if (visible) {
       backdropOpacity.setValue(0);
-      cardScale.setValue(0.92);
       cardOpacity.setValue(0);
+      const reduced = isReducedMotion();
+      cardScale.setValue(reduced ? 1 : 0.92);
 
       Animated.parallel([
         Animated.timing(backdropOpacity, {

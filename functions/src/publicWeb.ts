@@ -19,6 +19,8 @@ const YOUTUBE_RE = /^[A-Za-z0-9_-]{11}$/;
 const POS_RE = /^[a-zA-Z0-9%. -]{1,40}$/;
 const AR_RE = /^\d+(\.\d+)? \/ \d+(\.\d+)?$/;
 const MAX_ITEMS = 40;
+const MAX_GALLERY = 60;
+const CAPTION_MAX = 140;
 
 type Json = Record<string, unknown>;
 type Credit = { role: string; name: string; wide?: true };
@@ -118,6 +120,36 @@ function mediaUrl(bucketName: string, projectId: string, path: unknown, version:
   return `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodeURIComponent(value)}?alt=media&v=${version}`;
 }
 
+type GalleryOut = { src: string; thumb: string; width: number; height: number; caption?: string; kind: 'still' | 'bts' };
+
+/** Galería pública: sin ocultas, en el orden del panel, máx. 60, solo archivos de la carpeta de galería del proyecto */
+export function publicGallery(projectId: string, value: unknown, bucketName: string): GalleryOut[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const prefix = `web/projects/${projectId}/gallery/`;
+  const rows = value
+    .filter((item): item is Json => !!item && typeof item === 'object' && (item as Json).hidden !== true)
+    .sort((a, b) => (typeof a.order === 'number' ? a.order : 1e6) - (typeof b.order === 'number' ? b.order : 1e6));
+  const out: GalleryOut[] = [];
+  for (const row of rows) {
+    if (out.length >= MAX_GALLERY) break;
+    const path = str(row.path, 400); const thumbPath = str(row.thumbPath, 400);
+    const width = Number(row.width); const height = Number(row.height);
+    if (!path || !thumbPath || !path.startsWith(prefix) || !thumbPath.startsWith(prefix) || path.includes('..') || thumbPath.includes('..')) continue;
+    if (!Number.isInteger(width) || !Number.isInteger(height) || width <= 0 || height <= 0 || width > 10000 || height > 10000) continue;
+    const photo: GalleryOut = {
+      src: `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodeURIComponent(path)}?alt=media`,
+      thumb: `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodeURIComponent(thumbPath)}?alt=media`,
+      width, height,
+      kind: row.kind === 'bts' ? 'bts' : 'still',
+    };
+    // Texto plano: sin HTML, sin saltos de línea y recortado a 140 caracteres
+    const caption = typeof row.caption === 'string' ? row.caption.replace(/<[^>]*>/g, '').replace(/[<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, CAPTION_MAX) : '';
+    if (caption) photo.caption = caption;
+    out.push(photo);
+  }
+  return out.length ? out : undefined;
+}
+
 function toMillis(value: unknown): number {
   const candidate = value as { toMillis?: () => number } | undefined;
   return candidate && typeof candidate.toMillis === 'function' ? candidate.toMillis() : 0;
@@ -153,6 +185,7 @@ export function toPublicProject(id: string, web: Json, bucketName: string, peopl
   const youtube = str(web.youtube, 11); if (youtube && YOUTUBE_RE.test(youtube)) out.youtube = youtube;
   const actions = cleanActions(web.actions, true); if (actions) out.actions = actions;
   const homeActions = cleanActions(web.homeActions, false); if (homeActions) out.homeActions = homeActions;
+  const gallery = publicGallery(id, web.gallery, bucketName); if (gallery) out.gallery = gallery;
   const credits = web.creditsSource === 'crew' ? creditsFromPeople(people) : cleanCredits(web.credits);
   if (credits?.length) out.credits = credits;
   return { project: out, order: typeof web.order === 'number' ? web.order : 1000, updatedAt };
@@ -182,6 +215,16 @@ async function loadPublishedProjects(db: Firestore, bucketName: string) {
   return items;
 }
 
+/**
+ * JSON sin ETag: con ETag, Express (y el CDN) responden 304 a la revalidación del navegador,
+ * y ese 304 llega sin cabeceras CORS, así que el navegador bloquea la respuesta.
+ * La caché queda a cargo de Cache-Control (max-age / s-maxage / stale-while-revalidate).
+ */
+function sendJson(res: Response, status: number, body: unknown) {
+  res.removeHeader('ETag');
+  return res.status(status).type('application/json').end(JSON.stringify(body));
+}
+
 function applyCors(req: Request, res: Response) {
   res.set('Vary', 'Origin');
   const origin = req.header('origin');
@@ -199,22 +242,22 @@ export function registerPublicWebRoutes(app: Express, deps: { db: Firestore; buc
 
   app.get([base, `${base}/:slug`], async (req: Request, res: Response) => {
     applyCors(req, res);
-    if (limited(req)) return res.status(429).json({ error: 'RATE_LIMITED', message: 'Too many requests. Try again later.' });
+    if (limited(req)) return sendJson(res, 429, { error: 'RATE_LIMITED', message: 'Too many requests. Try again later.' });
     try {
       const items = await loadPublishedProjects(deps.db, deps.bucketName);
       res.set('Cache-Control', CACHE_CONTROL);
       const slug = req.params.slug;
       if (slug !== undefined) {
         const found = items.find((item) => item.project.slug === slug);
-        if (!found) { res.set('Cache-Control', 'public, max-age=30'); return res.status(404).json({ error: 'NOT_FOUND', message: 'Project not found.' }); }
-        return res.json(found.project);
+        if (!found) { res.set('Cache-Control', 'public, max-age=30'); return sendJson(res, 404, { error: 'NOT_FOUND', message: 'Project not found.' }); }
+        return sendJson(res, 200, found.project);
       }
       const updatedAt = items.reduce((max, item) => Math.max(max, item.updatedAt), 0);
-      return res.json({ version: 1, updatedAt: new Date(updatedAt || Date.now()).toISOString(), projects: items.map((item) => item.project) });
+      return sendJson(res, 200, { version: 1, updatedAt: new Date(updatedAt || Date.now()).toISOString(), projects: items.map((item) => item.project) });
     } catch (err) {
       console.error('[publicWeb]', err);
       res.set('Cache-Control', 'no-store');
-      return res.status(500).json({ error: 'INTERNAL_ERROR', message: 'An unexpected server error occurred.' });
+      return sendJson(res, 500, { error: 'INTERNAL_ERROR', message: 'An unexpected server error occurred.' });
     }
   });
 }

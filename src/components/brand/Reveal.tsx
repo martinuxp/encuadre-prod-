@@ -4,8 +4,9 @@
 // curva cubic-bezier(0.16, 1, 0.3, 1) en 800 ms. Respeta "reducir movimiento".
 // ═══════════════════════════════════════════════════════
 
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, AccessibilityInfo, Easing, StyleProp, ViewStyle } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, Easing, StyleProp, ViewStyle } from 'react-native';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 export const encEase = Easing.bezier(0.16, 1, 0.3, 1);
 /** Separación entre elementos de una cascada */
@@ -21,24 +22,20 @@ interface RevealProps {
 
 export const Reveal: React.FC<RevealProps> = ({ index = 0, delay = 0, style, children }) => {
   const progress = useRef(new Animated.Value(0)).current;
-  const [reduced, setReduced] = useState(false);
+  const reduced = useReducedMotion();
 
   useEffect(() => {
-    let cancelled = false;
-    AccessibilityInfo.isReduceMotionEnabled().then((value) => {
-      if (cancelled) return;
-      setReduced(value);
-      if (value) { progress.setValue(1); return; }
-      Animated.timing(progress, {
-        toValue: 1,
-        duration: 800,
-        delay: delay + index * STAGGER_MS,
-        easing: encEase,
-        useNativeDriver: true,
-      }).start();
-    }).catch(() => progress.setValue(1));
-    return () => { cancelled = true; };
-  }, [delay, index, progress]);
+    if (reduced) { progress.setValue(1); return; }
+    const anim = Animated.timing(progress, {
+      toValue: 1,
+      duration: 800,
+      delay: delay + index * STAGGER_MS,
+      easing: encEase,
+      useNativeDriver: true,
+    });
+    anim.start();
+    return () => anim.stop();
+  }, [delay, index, progress, reduced]);
 
   if (reduced) return <Animated.View style={style}>{children}</Animated.View>;
 

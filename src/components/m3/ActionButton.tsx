@@ -17,6 +17,7 @@ import {
 import { colors, typography, spacing, corners } from '@/theme/tokens';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ease, duration, scale } from '@/theme/animation';
+import { isReducedMotion } from '@/hooks/useReducedMotion';
 
 export type ButtonVariant = 'filled' | 'tonal' | 'outlined' | 'text';
 
@@ -81,6 +82,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
   const scaleAnim = React.useRef(new Animated.Value(scale.rest)).current;
 
   const animateTo = (toValue: number, useSpring: boolean) => {
+    if (isReducedMotion()) return;
     Animated.timing(scaleAnim, {
       toValue,
       duration: useSpring ? duration.medium2 : duration.short2,
@@ -91,6 +93,9 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
 
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
       onPress={onPress}
       onPressIn={() => animateTo(scale.pressed, false)}
       onPressOut={() => animateTo(scale.rest, true)}
@@ -144,7 +149,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
 
 const styles = StyleSheet.create({
   button: {
-    height: 40,
+    minHeight: 44,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

@@ -171,6 +171,26 @@ export interface WebCreditMark {
   order?: number;
 }
 
+/** Foto de la galería pública de un proyecto */
+export type WebGalleryKind = 'still' | 'bts';
+
+export interface WebGalleryPhoto {
+  id: string;
+  /** web/projects/{projectId}/gallery/{id}.webp (máx. 2400 px de lado largo) */
+  path: string;
+  /** web/projects/{projectId}/gallery/{id}-900.webp */
+  thumbPath: string;
+  /** Medidas de la versión grande */
+  width: number;
+  height: number;
+  /** Pie de foto, máx. 140 caracteres */
+  caption?: string;
+  /** "still" = Fotograma, "bts" = Detrás de cámaras */
+  kind: WebGalleryKind;
+  hidden?: boolean;
+  order: number;
+}
+
 export interface ProjectWeb {
   published: boolean;
   order: number;
@@ -198,6 +218,7 @@ export interface ProjectWeb {
   homeCredits: WebCredit[];
   credits?: WebCredit[];
   creditsSource?: 'manual' | 'crew';
+  gallery?: WebGalleryPhoto[];
   updatedAt?: Date;
 }
 

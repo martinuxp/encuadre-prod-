@@ -104,6 +104,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`Abrir ${project.web?.title || project.name}${webState ? `, web: ${WEB_TAG[webState].label}` : ''}`}
       onPress={onPress}
       onPressIn={pressIn}
       onPressOut={pressOut}
@@ -138,6 +140,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           {onOptions && (
             <IconButton
               icon="dots-vertical"
+              accessibilityLabel={`Opciones de ${project.name}`}
+              iconColor={tint ? ink : undefined}
               variant="standard"
               onPress={onOptions}
               style={styles.optionsBtn}

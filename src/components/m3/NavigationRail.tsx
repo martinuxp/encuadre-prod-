@@ -32,6 +32,10 @@ export const NavigationRail: React.FC<NavigationRailProps> = ({
           return (
             <Pressable
               key={item.key}
+              accessibilityRole="link"
+              accessibilityLabel={item.label}
+              accessibilityState={{ selected: isActive }}
+              aria-current={isActive ? 'page' : undefined}
               onPress={() => onSelect(item.key)}
               style={({ pressed }) => [
                 styles.item,
@@ -73,6 +77,8 @@ export const NavigationRail: React.FC<NavigationRailProps> = ({
 
       <View style={styles.bottomSection}>
         <Pressable
+          accessibilityRole="link"
+          accessibilityLabel="Ajustes"
           onPress={() => router.push('/settings')}
           style={styles.settingsBtn}
         >

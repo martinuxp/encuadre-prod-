@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Platform, ScrollView } from 'react-native';
-import { colors, typography, shapes, spacing } from '@/theme/tokens';
+import { colors, typography, shapes, spacing, fontFamily } from '@/theme/tokens';
 import { AppShell } from '@/components/m3/AppShell';
 import { ActionButton } from '@/components/m3/ActionButton';
 import { InfoCard } from '@/components/m3/InfoCard';
@@ -88,10 +88,11 @@ export default function NewProjectScreen() {
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Nombre del proyecto *</Text>
               <TextInput
+                accessibilityLabel="Nombre del proyecto"
                 value={name}
                 onChangeText={setName}
                 placeholder="Ej. Comercial Primavera 2026"
-                placeholderTextColor={colors.onSurfaceAlpha38}
+                placeholderTextColor={colors.placeholder}
                 style={[
                   styles.input,
                   Platform.OS === 'web' && { outlineStyle: 'none' } as any,
@@ -102,10 +103,11 @@ export default function NewProjectScreen() {
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Descripción / Sinopsis</Text>
               <TextInput
+                accessibilityLabel="Descripción / Sinopsis"
                 value={description}
                 onChangeText={setDescription}
                 placeholder="Escribe detalles del proyecto, locaciones principales..."
-                placeholderTextColor={colors.onSurfaceAlpha38}
+                placeholderTextColor={colors.placeholder}
                 multiline
                 numberOfLines={4}
                 style={[
@@ -120,7 +122,7 @@ export default function NewProjectScreen() {
               <View style={[styles.inputGroup, { flex: 1 }]}>
                 <Text style={styles.label}>Tipo de producción</Text>
                 {Platform.OS === 'web' ? (
-                  <select
+                  <select aria-label="Tipo de producción"
                     value={type}
                     onChange={(e) => setType(e.target.value as ProductionType)}
                     style={webSelectStyle}
@@ -137,6 +139,7 @@ export default function NewProjectScreen() {
                 ) : (
                   <TextInput
                     value={type}
+                    accessibilityLabel="Tipo de producción"
                     onChangeText={(val) => setType(val as ProductionType)}
                     style={styles.input}
                   />
@@ -146,7 +149,7 @@ export default function NewProjectScreen() {
               <View style={[styles.inputGroup, { flex: 1 }]}>
                 <Text style={styles.label}>Estado inicial</Text>
                 {Platform.OS === 'web' ? (
-                  <select
+                  <select aria-label="Estado inicial"
                     value={status}
                     onChange={(e) => setStatus(e.target.value as ProjectStatus)}
                     style={webSelectStyle}
@@ -159,6 +162,7 @@ export default function NewProjectScreen() {
                 ) : (
                   <TextInput
                     value={status}
+                    accessibilityLabel="Estado"
                     onChangeText={(val) => setStatus(val as ProjectStatus)}
                     style={styles.input}
                   />
@@ -170,10 +174,11 @@ export default function NewProjectScreen() {
               <View style={[styles.inputGroup, { flex: 1 }]}>
                 <Text style={styles.label}>Fecha de inicio</Text>
                 <TextInput
+                  accessibilityLabel="Fecha de inicio"
                   value={startDate}
                   onChangeText={setStartDate}
                   placeholder="YYYY-MM-DD"
-                  placeholderTextColor={colors.onSurfaceAlpha38}
+                  placeholderTextColor={colors.placeholder}
                   style={[
                     styles.input,
                     Platform.OS === 'web' && { outlineStyle: 'none' } as any,
@@ -184,10 +189,11 @@ export default function NewProjectScreen() {
               <View style={[styles.inputGroup, { flex: 1 }]}>
                 <Text style={styles.label}>Fecha de término (Opcional)</Text>
                 <TextInput
+                  accessibilityLabel="Fecha de término (Opcional)"
                   value={endDate}
                   onChangeText={setEndDate}
                   placeholder="YYYY-MM-DD"
-                  placeholderTextColor={colors.onSurfaceAlpha38}
+                  placeholderTextColor={colors.placeholder}
                   style={[
                     styles.input,
                     Platform.OS === 'web' && { outlineStyle: 'none' } as any,
@@ -222,17 +228,16 @@ export default function NewProjectScreen() {
 // Estilo CSS inline para el select nativo de web en modo oscuro
 const webSelectStyle: any = {
   height: '48px',
-  backgroundColor: colors.surfaceContainer,
-  borderRadius: '8px',
+  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  borderRadius: '10px',
   paddingLeft: '16px',
   paddingRight: '16px',
   color: colors.onSurface,
-  borderWidth: '1px',
+  borderWidth: '2px',
   borderStyle: 'solid',
-  borderColor: colors.outlineVariant,
-  outlineStyle: 'none',
+  borderColor: 'rgba(255, 255, 255, 0.25)',
   fontSize: '16px',
-  fontFamily: 'Inter, sans-serif',
+  fontFamily: fontFamily,
 };
 
 const styles = StyleSheet.create({

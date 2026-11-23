@@ -130,6 +130,45 @@ const resizeToWebp = async (bitmap: ImageBitmap | HTMLImageElement, maxWidth: nu
   return blob;
 };
 
+export const GALLERY_MAX_SIDE = 2400;
+export const GALLERY_THUMB_SIDE = 900;
+export const GALLERY_MAX_PHOTOS = 60;
+export const GALLERY_CAPTION_MAX = 140;
+
+/** Redimensiona por el lado largo y exporta WebP, devolviendo las medidas finales */
+const resizeLongSideToWebp = async (bitmap: ImageBitmap | HTMLImageElement, maxSide: number): Promise<{ blob: Blob; width: number; height: number }> => {
+  const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(bitmap.width * scale);
+  canvas.height = Math.round(bitmap.height * scale);
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Canvas no disponible.');
+  ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  const blob = await canvasToBlob(canvas, 'image/webp', WEBP_QUALITY);
+  if (blob.type !== 'image/webp') throw new Error('Este navegador no puede exportar WebP.');
+  return { blob, width: canvas.width, height: canvas.height };
+};
+
+export interface ProcessedGalleryPhoto {
+  large: Blob;
+  thumb: Blob;
+  width: number;
+  height: number;
+}
+
+/** Foto de galería: WebP ~82 de máx. 2400 px por el lado largo + miniatura de 900 px. Solo web. */
+export const processGalleryImage = async (blob: Blob): Promise<ProcessedGalleryPhoto> => {
+  if (!isWeb) throw new Error('La galería se edita desde la versión web del panel.');
+  if (!blob.type.startsWith('image/')) throw new Error('El archivo no es una imagen.');
+  const bitmap = await loadBitmap(blob);
+  const [large, thumb] = await Promise.all([resizeLongSideToWebp(bitmap, GALLERY_MAX_SIDE), resizeLongSideToWebp(bitmap, GALLERY_THUMB_SIDE)]);
+  return { large: large.blob, thumb: thumb.blob, width: large.width, height: large.height };
+};
+
+/** URL pública de un archivo de Storage bajo web/** (lectura pública en las reglas) */
+export const publicStorageUrl = (bucket: string, path: string): string =>
+  `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(path)}?alt=media`;
+
 export interface ProcessedHero {
   hero: Blob;
   thumb: Blob;

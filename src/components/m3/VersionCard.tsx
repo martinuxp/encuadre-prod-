@@ -128,6 +128,7 @@ export const VersionCard: React.FC<VersionCardProps> = ({
           {onLockToggle && (
             <IconButton
               icon={isLocked ? 'lock-open-outline' : 'lock-outline'}
+              accessibilityLabel={isLocked ? 'Desbloquear versión' : 'Bloquear versión'}
               variant="outlined"
               onPress={onLockToggle}
               style={styles.iconBtn}

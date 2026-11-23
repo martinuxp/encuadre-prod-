@@ -89,6 +89,7 @@ export const FileCard: React.FC<FileCardProps> = ({
         {onDownload && (
           <IconButton
             icon="download"
+            accessibilityLabel={`Descargar ${name}`}
             variant="standard"
             onPress={onDownload}
             iconColor={colors.primary}
@@ -97,6 +98,7 @@ export const FileCard: React.FC<FileCardProps> = ({
         {onDelete && (
           <IconButton
             icon="trash-can-outline"
+            accessibilityLabel={`Eliminar ${name}`}
             variant="standard"
             onPress={onDelete}
             iconColor={colors.error}

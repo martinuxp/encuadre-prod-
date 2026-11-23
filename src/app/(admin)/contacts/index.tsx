@@ -520,10 +520,11 @@ export default function ContactsScreen() {
             <View style={styles.searchInputWrap}>
               <MaterialCommunityIcons name="magnify" size={20} color={colors.onSurfaceVariant} style={styles.searchIcon} />
               <TextInput
+                accessibilityLabel="Buscar por nombre, rol, departamento, destrezas"
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 placeholder="Buscar por nombre, rol, departamento, destrezas..."
-                placeholderTextColor={colors.onSurfaceAlpha38}
+                placeholderTextColor={colors.placeholder}
                 style={[styles.searchInput, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
               />
               {!!searchQuery && (
@@ -962,10 +963,11 @@ export default function ContactsScreen() {
                   <View style={styles.inputGroup}>
                     <Text style={styles.inputLabel}>Nombre completo *</Text>
                     <TextInput
+                      accessibilityLabel="Nombre completo"
                       value={contactForm.name}
                       onChangeText={(v) => setContactForm({ ...contactForm, name: v })}
                       placeholder="Ej. Rodrigo Morales / Sofía Valenzuela"
-                      placeholderTextColor={colors.onSurfaceAlpha38}
+                      placeholderTextColor={colors.placeholder}
                       style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                     />
                   </View>
@@ -974,10 +976,11 @@ export default function ContactsScreen() {
                     <View style={[styles.inputGroup, { flex: 1, minWidth: 200 }]}>
                       <Text style={styles.inputLabel}>Rol / Cargo Principal *</Text>
                       <TextInput
+                        accessibilityLabel="Rol / Cargo Principal"
                         value={contactForm.role}
                         onChangeText={(v) => setContactForm({ ...contactForm, role: v })}
                         placeholder={contactForm.category === 'actor' ? 'Ej. Protagónico, Coprotagónico' : 'Ej. Gaffer, Asistente Cámara'}
-                        placeholderTextColor={colors.onSurfaceAlpha38}
+                        placeholderTextColor={colors.placeholder}
                         style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                       />
                     </View>
@@ -987,7 +990,7 @@ export default function ContactsScreen() {
                       {/* ── Departamento: select nativo en web, chips en móvil ── */}
                       {Platform.OS === 'web' ? (
                         <View style={styles.deptSelectWrap}>
-                          <select
+                          <select aria-label="Departamento"
                             value={contactForm.department}
                             onChange={(e) =>
                               setContactForm({ ...contactForm, department: (e.target as HTMLSelectElement).value })
@@ -1068,10 +1071,11 @@ export default function ContactsScreen() {
                       <Text style={styles.inputLabel}>Teléfono</Text>
                       <View style={styles.inputWithIcon}>
                         <TextInput
+                          accessibilityLabel="Teléfono"
                           value={contactForm.phone}
                           onChangeText={(v) => setContactForm({ ...contactForm, phone: v })}
                           placeholder="+56 9 1234 5678"
-                          placeholderTextColor={colors.onSurfaceAlpha38}
+                          placeholderTextColor={colors.placeholder}
                           keyboardType="phone-pad"
                           style={[styles.input, styles.inputIconPad, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                         />
@@ -1082,10 +1086,11 @@ export default function ContactsScreen() {
                       <Text style={styles.inputLabel}>WhatsApp</Text>
                       <View style={styles.inputWithIcon}>
                         <TextInput
+                          accessibilityLabel="WhatsApp"
                           value={contactForm.whatsapp}
                           onChangeText={(v) => setContactForm({ ...contactForm, whatsapp: v })}
                           placeholder="+56 9 1234 5678"
-                          placeholderTextColor={colors.onSurfaceAlpha38}
+                          placeholderTextColor={colors.placeholder}
                           keyboardType="phone-pad"
                           style={[styles.input, styles.inputIconPad, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                         />
@@ -1097,10 +1102,11 @@ export default function ContactsScreen() {
                     <View style={[styles.inputGroup, { flex: 1, minWidth: 200 }]}>
                       <Text style={styles.inputLabel}>Correo electrónico</Text>
                       <TextInput
+                        accessibilityLabel="Correo electrónico"
                         value={contactForm.email}
                         onChangeText={(v) => setContactForm({ ...contactForm, email: v })}
                         placeholder="contacto@ejemplo.cl"
-                        placeholderTextColor={colors.onSurfaceAlpha38}
+                        placeholderTextColor={colors.placeholder}
                         keyboardType="email-address"
                         autoCapitalize="none"
                         style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
@@ -1112,10 +1118,11 @@ export default function ContactsScreen() {
                       <View style={styles.inputWithIcon}>
                         <Text style={styles.inputPrefix}>@</Text>
                         <TextInput
+                          accessibilityLabel="Instagram"
                           value={contactForm.instagram}
                           onChangeText={(v) => setContactForm({ ...contactForm, instagram: v.replace(/^@/, '') })}
                           placeholder="usuario"
-                          placeholderTextColor={colors.onSurfaceAlpha38}
+                          placeholderTextColor={colors.placeholder}
                           autoCapitalize="none"
                           autoCorrect={false}
                           style={[styles.input, styles.inputIconPad, { flex: 1, borderLeftWidth: 0, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
@@ -1129,10 +1136,11 @@ export default function ContactsScreen() {
                     <View style={[styles.inputGroup, { flex: 1, minWidth: 200 }]}>
                       <Text style={styles.inputLabel}>Agencia / Representante</Text>
                       <TextInput
+                        accessibilityLabel="Agencia / Representante"
                         value={contactForm.agency}
                         onChangeText={(v) => setContactForm({ ...contactForm, agency: v })}
                         placeholder="Ej. Talent Agency Chile / Independiente"
-                        placeholderTextColor={colors.onSurfaceAlpha38}
+                        placeholderTextColor={colors.placeholder}
                         style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                       />
                     </View>
@@ -1183,10 +1191,11 @@ export default function ContactsScreen() {
                     <View style={[styles.inputGroup, { flex: 1, minWidth: 140 }]}>
                       <Text style={styles.inputLabel}>Rango de Edad</Text>
                       <TextInput
+                        accessibilityLabel="Rango de Edad"
                         value={contactForm.ageRange}
                         onChangeText={(v) => setContactForm({ ...contactForm, ageRange: v })}
                         placeholder="Ej. 25-35 años"
-                        placeholderTextColor={colors.onSurfaceAlpha38}
+                        placeholderTextColor={colors.placeholder}
                         style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                       />
                     </View>
@@ -1194,10 +1203,11 @@ export default function ContactsScreen() {
                     <View style={[styles.inputGroup, { flex: 1, minWidth: 140 }]}>
                       <Text style={styles.inputLabel}>Estatura (m)</Text>
                       <TextInput
+                        accessibilityLabel="Estatura (m)"
                         value={contactForm.height}
                         onChangeText={(v) => setContactForm({ ...contactForm, height: v })}
                         placeholder="Ej. 1.78 m"
-                        placeholderTextColor={colors.onSurfaceAlpha38}
+                        placeholderTextColor={colors.placeholder}
                         style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                       />
                     </View>
@@ -1207,10 +1217,11 @@ export default function ContactsScreen() {
                     <View style={[styles.inputGroup, { flex: 1, minWidth: 140 }]}>
                       <Text style={styles.inputLabel}>Talla de Vestuario</Text>
                       <TextInput
+                        accessibilityLabel="Talla de Vestuario"
                         value={contactForm.clothingSize}
                         onChangeText={(v) => setContactForm({ ...contactForm, clothingSize: v })}
                         placeholder="Ej. M / 42"
-                        placeholderTextColor={colors.onSurfaceAlpha38}
+                        placeholderTextColor={colors.placeholder}
                         style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                       />
                     </View>
@@ -1218,10 +1229,11 @@ export default function ContactsScreen() {
                     <View style={[styles.inputGroup, { flex: 1, minWidth: 140 }]}>
                       <Text style={styles.inputLabel}>Calzado</Text>
                       <TextInput
+                        accessibilityLabel="Calzado"
                         value={contactForm.shoeSize}
                         onChangeText={(v) => setContactForm({ ...contactForm, shoeSize: v })}
                         placeholder="Ej. 41"
-                        placeholderTextColor={colors.onSurfaceAlpha38}
+                        placeholderTextColor={colors.placeholder}
                         style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                       />
                     </View>
@@ -1231,10 +1243,11 @@ export default function ContactsScreen() {
                     <View style={[styles.inputGroup, { flex: 1, minWidth: 140 }]}>
                       <Text style={styles.inputLabel}>Color de Ojos</Text>
                       <TextInput
+                        accessibilityLabel="Color de Ojos"
                         value={contactForm.eyeColor}
                         onChangeText={(v) => setContactForm({ ...contactForm, eyeColor: v })}
                         placeholder="Ej. Café, Verde, Azul"
-                        placeholderTextColor={colors.onSurfaceAlpha38}
+                        placeholderTextColor={colors.placeholder}
                         style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                       />
                     </View>
@@ -1242,10 +1255,11 @@ export default function ContactsScreen() {
                     <View style={[styles.inputGroup, { flex: 1, minWidth: 140 }]}>
                       <Text style={styles.inputLabel}>Color de Pelo</Text>
                       <TextInput
+                        accessibilityLabel="Color de Pelo"
                         value={contactForm.hairColor}
                         onChangeText={(v) => setContactForm({ ...contactForm, hairColor: v })}
                         placeholder="Ej. Castaño, Rubio"
-                        placeholderTextColor={colors.onSurfaceAlpha38}
+                        placeholderTextColor={colors.placeholder}
                         style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                       />
                     </View>
@@ -1254,10 +1268,11 @@ export default function ContactsScreen() {
                   <View style={styles.inputGroup}>
                     <Text style={styles.inputLabel}>Habilidades / Destrezas Especiales (separadas por coma)</Text>
                     <TextInput
+                      accessibilityLabel="Habilidades / Destrezas Especiales (separadas por coma)"
                       value={contactForm.skillsRaw}
                       onChangeText={(v) => setContactForm({ ...contactForm, skillsRaw: v })}
                       placeholder="Ej. Acento neutro, Inglés fluido, Combate escénico, Canto, Danza"
-                      placeholderTextColor={colors.onSurfaceAlpha38}
+                      placeholderTextColor={colors.placeholder}
                       style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                     />
                   </View>
@@ -1270,10 +1285,11 @@ export default function ContactsScreen() {
                   <View style={styles.inputGroup}>
                     <Text style={styles.inputLabel}>Enlace Showreel / Portafolio / IMDb / Vimeo</Text>
                     <TextInput
+                      accessibilityLabel="Enlace Showreel / Portafolio / IMDb / Vimeo"
                       value={contactForm.portfolioUrl}
                       onChangeText={(v) => setContactForm({ ...contactForm, portfolioUrl: v })}
                       placeholder="https://vimeo.com/... o https://imdb.com/..."
-                      placeholderTextColor={colors.onSurfaceAlpha38}
+                      placeholderTextColor={colors.placeholder}
                       style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                     />
                   </View>
@@ -1281,10 +1297,11 @@ export default function ContactsScreen() {
                   <View style={styles.inputGroup}>
                     <Text style={styles.inputLabel}>Tarifa referencial por jornada (opcional)</Text>
                     <TextInput
+                      accessibilityLabel="Tarifa referencial por jornada (opcional)"
                       value={contactForm.ratePerDay}
                       onChangeText={(v) => setContactForm({ ...contactForm, ratePerDay: v })}
                       placeholder="Ej. $150.000 / jornada + IVA"
-                      placeholderTextColor={colors.onSurfaceAlpha38}
+                      placeholderTextColor={colors.placeholder}
                       style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                     />
                   </View>
@@ -1293,10 +1310,11 @@ export default function ContactsScreen() {
                     <View style={styles.inputGroup}>
                       <Text style={styles.inputLabel}>Especialidades / Herramientas (separadas por coma)</Text>
                       <TextInput
+                        accessibilityLabel="Especialidades / Herramientas (separadas por coma)"
                         value={contactForm.skillsRaw}
                         onChangeText={(v) => setContactForm({ ...contactForm, skillsRaw: v })}
                         placeholder="Ej. ARRI Alexa, Steadicam, DaVinci Resolve, Drone"
-                        placeholderTextColor={colors.onSurfaceAlpha38}
+                        placeholderTextColor={colors.placeholder}
                         style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                       />
                     </View>
@@ -1305,10 +1323,11 @@ export default function ContactsScreen() {
                   <View style={styles.inputGroup}>
                     <Text style={styles.inputLabel}>Notas de producción internas</Text>
                     <TextInput
+                      accessibilityLabel="Notas de producción internas"
                       value={contactForm.notes}
                       onChangeText={(v) => setContactForm({ ...contactForm, notes: v })}
                       placeholder="Comentarios sobre puntualidad, restricciones alimentarias, etc."
-                      placeholderTextColor={colors.onSurfaceAlpha38}
+                      placeholderTextColor={colors.placeholder}
                       multiline
                       numberOfLines={3}
                       style={[styles.input, styles.textarea, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
@@ -1458,10 +1477,11 @@ export default function ContactsScreen() {
                     <View style={[styles.inputGroup, { flex: 1, minWidth: 120 }]}>
                       <Text style={styles.inputLabel}>Fecha de Rodaje *</Text>
                       <TextInput
+                        accessibilityLabel="Fecha de Rodaje"
                         value={callForm.callDate}
                         onChangeText={(v) => setCallForm({ ...callForm, callDate: v })}
                         placeholder="YYYY-MM-DD"
-                        placeholderTextColor={colors.onSurfaceAlpha38}
+                        placeholderTextColor={colors.placeholder}
                         style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                       />
                     </View>
@@ -1469,10 +1489,11 @@ export default function ContactsScreen() {
                     <View style={[styles.inputGroup, { flex: 1, minWidth: 100 }]}>
                       <Text style={styles.inputLabel}>Hora Citación *</Text>
                       <TextInput
+                        accessibilityLabel="Hora Citación"
                         value={callForm.callTime}
                         onChangeText={(v) => setCallForm({ ...callForm, callTime: v })}
                         placeholder="08:00"
-                        placeholderTextColor={colors.onSurfaceAlpha38}
+                        placeholderTextColor={colors.placeholder}
                         style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                       />
                     </View>
@@ -1480,10 +1501,11 @@ export default function ContactsScreen() {
                     <View style={[styles.inputGroup, { flex: 1, minWidth: 100 }]}>
                       <Text style={styles.inputLabel}>Hora Llegada</Text>
                       <TextInput
+                        accessibilityLabel="Hora Llegada"
                         value={callForm.arrivalTime}
                         onChangeText={(v) => setCallForm({ ...callForm, arrivalTime: v })}
                         placeholder="07:30"
-                        placeholderTextColor={colors.onSurfaceAlpha38}
+                        placeholderTextColor={colors.placeholder}
                         style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                       />
                     </View>
@@ -1493,10 +1515,11 @@ export default function ContactsScreen() {
                   <View style={styles.inputGroup}>
                     <Text style={styles.inputLabel}>Nombre del Set / Locación *</Text>
                     <TextInput
+                      accessibilityLabel="Nombre del Set / Locación"
                       value={callForm.locationName}
                       onChangeText={(v) => setCallForm({ ...callForm, locationName: v })}
                       placeholder="Ej. Estudio Principal Encuadre / Casa Quinta Normal"
-                      placeholderTextColor={colors.onSurfaceAlpha38}
+                      placeholderTextColor={colors.placeholder}
                       style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                     />
                   </View>
@@ -1504,10 +1527,11 @@ export default function ContactsScreen() {
                   <View style={styles.inputGroup}>
                     <Text style={styles.inputLabel}>Dirección Completa *</Text>
                     <TextInput
+                      accessibilityLabel="Dirección Completa"
                       value={callForm.locationAddress}
                       onChangeText={(v) => setCallForm({ ...callForm, locationAddress: v })}
                       placeholder="Ej. Av. Providencia 1234, Santiago"
-                      placeholderTextColor={colors.onSurfaceAlpha38}
+                      placeholderTextColor={colors.placeholder}
                       style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                     />
                   </View>
@@ -1517,10 +1541,11 @@ export default function ContactsScreen() {
                     <View style={[styles.inputGroup, { flex: 1, minWidth: 160 }]}>
                       <Text style={styles.inputLabel}>Rol en Citación</Text>
                       <TextInput
+                        accessibilityLabel="Rol en Citación"
                         value={callForm.role}
                         onChangeText={(v) => setCallForm({ ...callForm, role: v })}
                         placeholder="Rol"
-                        placeholderTextColor={colors.onSurfaceAlpha38}
+                        placeholderTextColor={colors.placeholder}
                         style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                       />
                     </View>
@@ -1528,10 +1553,11 @@ export default function ContactsScreen() {
                     <View style={[styles.inputGroup, { flex: 1, minWidth: 160 }]}>
                       <Text style={styles.inputLabel}>Vestuario / Equipamiento</Text>
                       <TextInput
+                        accessibilityLabel="Vestuario / Equipamiento"
                         value={callForm.costume}
                         onChangeText={(v) => setCallForm({ ...callForm, costume: v })}
                         placeholder="Indicaciones de vestuario"
-                        placeholderTextColor={colors.onSurfaceAlpha38}
+                        placeholderTextColor={colors.placeholder}
                         style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                       />
                     </View>
@@ -1541,10 +1567,11 @@ export default function ContactsScreen() {
                   <View style={styles.inputGroup}>
                     <Text style={styles.inputLabel}>Instrucciones para el participante</Text>
                     <TextInput
+                      accessibilityLabel="Instrucciones para el participante"
                       value={callForm.instructions}
                       onChangeText={(v) => setCallForm({ ...callForm, instructions: v })}
                       placeholder="Indicaciones de rodaje, catering, estacionamiento, etc."
-                      placeholderTextColor={colors.onSurfaceAlpha38}
+                      placeholderTextColor={colors.placeholder}
                       multiline
                       numberOfLines={2}
                       style={[styles.input, styles.textarea, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
@@ -1556,10 +1583,11 @@ export default function ContactsScreen() {
                     <View style={[styles.inputGroup, { flex: 1, minWidth: 160 }]}>
                       <Text style={styles.inputLabel}>Contacto en Set (Nombre)</Text>
                       <TextInput
+                        accessibilityLabel="Contacto en Set (Nombre)"
                         value={callForm.contactName}
                         onChangeText={(v) => setCallForm({ ...callForm, contactName: v })}
                         placeholder="Productor a cargo"
-                        placeholderTextColor={colors.onSurfaceAlpha38}
+                        placeholderTextColor={colors.placeholder}
                         style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                       />
                     </View>
@@ -1567,10 +1595,11 @@ export default function ContactsScreen() {
                     <View style={[styles.inputGroup, { flex: 1, minWidth: 160 }]}>
                       <Text style={styles.inputLabel}>Teléfono Contacto</Text>
                       <TextInput
+                        accessibilityLabel="Teléfono Contacto"
                         value={callForm.contactPhone}
                         onChangeText={(v) => setCallForm({ ...callForm, contactPhone: v })}
                         placeholder="+56 9 ..."
-                        placeholderTextColor={colors.onSurfaceAlpha38}
+                        placeholderTextColor={colors.placeholder}
                         style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                       />
                     </View>
@@ -1939,7 +1968,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       web: {
         cursor: 'pointer',
-        transition: 'transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 200ms ease',
+        transition: 'transform 200ms cubic-bezier(0.16, 1, 0.3, 1), background-color 200ms ease',
       } as any,
     }),
   },
@@ -1971,7 +2000,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       web: {
         cursor: 'pointer',
-        transition: 'transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 200ms ease',
+        transition: 'transform 200ms cubic-bezier(0.16, 1, 0.3, 1), background-color 200ms ease',
       } as any,
     }),
   },
@@ -2022,7 +2051,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     ...Platform.select({
       web: {
-        transition: 'transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 200ms cubic-bezier(0.2, 0, 0, 1), border-color 200ms cubic-bezier(0.2, 0, 0, 1)',
+        transition: 'transform 300ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.2, 0, 0, 1), border-color 200ms cubic-bezier(0.2, 0, 0, 1)',
       } as any,
     }),
   },
@@ -2182,7 +2211,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       web: {
         cursor: 'pointer',
-        transition: 'transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 150ms ease',
+        transition: 'transform 200ms cubic-bezier(0.16, 1, 0.3, 1), background-color 150ms ease',
       } as any,
     }),
   },
@@ -2261,7 +2290,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       web: {
         cursor: 'pointer',
-        transition: 'all 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+        transition: 'all 200ms cubic-bezier(0.16, 1, 0.3, 1)',
       } as any,
     }),
   },
@@ -2297,7 +2326,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       web: {
         cursor: 'pointer',
-        transition: 'all 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+        transition: 'all 200ms cubic-bezier(0.16, 1, 0.3, 1)',
       } as any,
     }),
   },
@@ -2442,7 +2471,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       web: {
         cursor: 'pointer',
-        transition: 'all 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+        transition: 'all 200ms cubic-bezier(0.16, 1, 0.3, 1)',
       } as any,
     }),
   },

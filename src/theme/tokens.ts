@@ -79,6 +79,8 @@ export const colors = {
   onSurfaceAlpha08: 'rgba(255, 255, 255, 0.08)',
   onSurfaceAlpha12: 'rgba(255, 255, 255, 0.12)',
   onSurfaceAlpha38: 'rgba(255, 255, 255, 0.38)',
+  /** Texto de ejemplo en campos: 0.55 sobre superficies oscuras ≈ 5:1 (AA) */
+  placeholder: 'rgba(255, 255, 255, 0.55)',
   scrimAlpha32: 'rgba(0, 0, 0, 0.32)',
 } as const;
 

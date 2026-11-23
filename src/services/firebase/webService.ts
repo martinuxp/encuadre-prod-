@@ -16,9 +16,10 @@ import {
   serverTimestamp,
 } from 'firebase/firestore';
 import { ref, uploadBytes, deleteObject } from 'firebase/storage';
-import { Project, ProjectWeb, WebCreditMark } from '@/types';
+import { Project, ProjectWeb, WebCreditMark, WebGalleryPhoto } from '@/types';
+import { uuidv4 } from '@/utils/uuid';
 import { projectService } from './projectService';
-import { isHexColor, isValidSlug, processHeroImage, logoExtension, LOGO_MAX_BYTES } from '@/utils/web';
+import { isHexColor, isValidSlug, processHeroImage, processGalleryImage, logoExtension, LOGO_MAX_BYTES, GALLERY_MAX_PHOTOS, GALLERY_CAPTION_MAX } from '@/utils/web';
 
 const PROJECTS_COL = 'projects';
 const CACHE_CONTROL = 'public,max-age=300';
@@ -103,6 +104,53 @@ export const webService = {
   removeStale: async (previous: (string | undefined)[], keep: string[]): Promise<void> => {
     const stale = previous.filter((p): p is string => !!p && !keep.includes(p));
     await Promise.all(stale.map((path) => deleteObject(ref(storage, path)).catch(() => undefined)));
+  },
+
+  // ── Galería ──
+
+  /**
+   * Sube varias fotos (cada una en WebP grande + miniatura) y devuelve las entradas nuevas,
+   * numeradas a continuación de `startOrder`. Avisa por foto con `onProgress`.
+   */
+  uploadGalleryPhotos: async (
+    projectId: string,
+    files: Blob[],
+    startOrder: number,
+    onProgress?: (done: number, total: number) => void,
+  ): Promise<WebGalleryPhoto[]> => {
+    const added: WebGalleryPhoto[] = [];
+    for (const [index, file] of files.entries()) {
+      const { large, thumb, width, height } = await processGalleryImage(file);
+      const id = uuidv4();
+      const path = `web/projects/${projectId}/gallery/${id}.webp`;
+      const thumbPath = `web/projects/${projectId}/gallery/${id}-900.webp`;
+      await Promise.all([
+        uploadBytes(ref(storage, path), large, { contentType: 'image/webp', cacheControl: 'public,max-age=31536000,immutable' }),
+        uploadBytes(ref(storage, thumbPath), thumb, { contentType: 'image/webp', cacheControl: 'public,max-age=31536000,immutable' }),
+      ]);
+      added.push({ id, path, thumbPath, width, height, kind: 'still', order: startOrder + index });
+      onProgress?.(index + 1, files.length);
+    }
+    return added;
+  },
+
+  /** Guarda la galería completa (el índice del arreglo pasa a ser `order`) */
+  saveGallery: async (projectId: string, gallery: WebGalleryPhoto[]): Promise<WebGalleryPhoto[]> => {
+    if (gallery.length > GALLERY_MAX_PHOTOS) throw new Error(`La galería admite máximo ${GALLERY_MAX_PHOTOS} fotos.`);
+    const normalized = gallery.map((photo, index) => {
+      const caption = photo.caption?.trim().slice(0, GALLERY_CAPTION_MAX);
+      const entry: WebGalleryPhoto = { id: photo.id, path: photo.path, thumbPath: photo.thumbPath, width: photo.width, height: photo.height, kind: photo.kind, order: index };
+      if (caption) entry.caption = caption;
+      if (photo.hidden) entry.hidden = true;
+      return entry;
+    });
+    await updateDoc(doc(db, PROJECTS_COL, projectId), { 'web.gallery': normalized, 'web.updatedAt': serverTimestamp() });
+    return normalized;
+  },
+
+  /** Borra los archivos de una foto (la entrada se quita al guardar la galería) */
+  deleteGalleryFiles: async (photo: WebGalleryPhoto): Promise<void> => {
+    await Promise.all([photo.path, photo.thumbPath].map((path) => deleteObject(ref(storage, path)).catch(() => undefined)));
   },
 
   /** Proyectos con ficha web, ordenados por `web.order` (no incluye eliminados) */

@@ -116,6 +116,7 @@ export default function ProjectDetailLayout() {
 
         {/* Barra de Pestañas de Subnavegación */}
         <ScrollView
+          accessibilityRole="tablist"
           horizontal
           showsHorizontalScrollIndicator={false}
           style={styles.tabBar}
@@ -126,6 +127,8 @@ export default function ProjectDetailLayout() {
             return (
               <Pressable
                 key={tab.key}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: isActive }}
                 onPress={() => handleTabSelect(tab.key)}
                 style={[
                   styles.tab,
@@ -200,7 +203,7 @@ const styles = StyleSheet.create({
     opacity: 0.85,
   },
   tabBar: {
-    maxHeight: 48,
+    maxHeight: 56,
   },
   tabBarContent: {
     gap: spacing.xs + 2,
@@ -212,6 +215,7 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     paddingHorizontal: spacing.base,
     paddingVertical: spacing.sm,
+    minHeight: 44,
     borderRadius: shapes.small,
     borderWidth: 1,
     ...Platform.select({

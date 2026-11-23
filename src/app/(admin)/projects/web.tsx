@@ -9,6 +9,7 @@ import { useRouter } from 'expo-router';
 import { colors, typography, shapes, spacing } from '@/theme/tokens';
 import { AppShell } from '@/components/m3/AppShell';
 import { ActionButton } from '@/components/m3/ActionButton';
+import { IconButton } from '@/components/m3/IconButton';
 import { StatusChip } from '@/components/m3/StatusChip';
 import { EmptyState } from '@/components/m3/EmptyState';
 import { LoadingState } from '@/components/m3/LoadingState';
@@ -60,8 +61,8 @@ export default function WebOrderScreen() {
               <Text style={styles.hint}>{p.web!.kind} · /{p.web!.slug}</Text>
             </View>
             <StatusChip label={p.web!.published ? 'PUBLICADO' : 'OCULTO'} status={p.web!.published ? 'success' : 'default'} />
-            <ActionButton label="↑" variant="tonal" disabled={i === 0} onPress={() => move(i, i - 1)} />
-            <ActionButton label="↓" variant="tonal" disabled={i === items.length - 1} onPress={() => move(i, i + 1)} />
+            <IconButton icon="arrow-up" variant="tonal" accessibilityLabel={`Subir ${p.web!.title || p.name}`} disabled={i === 0} onPress={() => move(i, i - 1)} />
+            <IconButton icon="arrow-down" variant="tonal" accessibilityLabel={`Bajar ${p.web!.title || p.name}`} disabled={i === items.length - 1} onPress={() => move(i, i + 1)} />
             <ActionButton label="Editar" variant="text" onPress={() => router.push(`/projects/${p.id}/web`)} />
           </View>
         ))}

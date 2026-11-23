@@ -373,11 +373,12 @@ export const DriveBrowser: React.FC<DriveBrowserProps> = ({
 
       <View style={styles.searchRow}>
         <TextInput
+          accessibilityLabel="Buscar archivos"
           style={styles.searchInput}
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholder="Buscar archivos..."
-          placeholderTextColor={colors.onSurfaceAlpha38}
+          placeholderTextColor={colors.placeholder}
           onSubmitEditing={handleSearch}
         />
         <Pressable style={styles.searchBtn} onPress={handleSearch}>
@@ -481,11 +482,12 @@ export const DriveBrowser: React.FC<DriveBrowserProps> = ({
                 <View style={{ gap: spacing.xs }}>
                   <Text style={styles.label}>Contraseña (opcional)</Text>
                   <TextInput
+                    accessibilityLabel="Contraseña (opcional)"
                     style={styles.input}
                     value={sharePassword}
                     onChangeText={setSharePassword}
                     placeholder="Dejar vacío para acceso libre"
-                    placeholderTextColor={colors.onSurfaceAlpha38}
+                    placeholderTextColor={colors.placeholder}
                     secureTextEntry
                   />
                 </View>
@@ -493,11 +495,12 @@ export const DriveBrowser: React.FC<DriveBrowserProps> = ({
                 <View style={{ gap: spacing.xs }}>
                   <Text style={styles.label}>Vencimiento en días (opcional)</Text>
                   <TextInput
+                    accessibilityLabel="Vencimiento en días (opcional)"
                     style={styles.input}
                     value={shareExpiresDays}
                     onChangeText={setShareExpiresDays}
                     placeholder="Ej: 7"
-                    placeholderTextColor={colors.onSurfaceAlpha38}
+                    placeholderTextColor={colors.placeholder}
                     keyboardType="numeric"
                   />
                 </View>

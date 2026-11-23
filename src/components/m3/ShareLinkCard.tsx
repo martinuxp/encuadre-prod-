@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   statusActive: { backgroundColor: 'rgba(129,199,132,0.15)' },
-  statusRevoked: { backgroundColor: 'rgba(255,180,171,0.15)' },
+  statusRevoked: { backgroundColor: 'rgba(255, 179, 192, 0.15)' },
   statusExpired: { backgroundColor: 'rgba(255,213,79,0.15)' },
   statusText: {
     ...typography.labelSmall,

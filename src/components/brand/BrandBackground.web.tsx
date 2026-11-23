@@ -7,7 +7,7 @@
 import React from 'react';
 import { Asset } from 'expo-asset';
 
-const grain = Asset.fromModule(require('../../../assets/brand/grain.png')).uri;
+const grain = Asset.fromModule(require('../../../assets/brand/grain.webp')).uri;
 const lines = Asset.fromModule(require('../../../assets/brand/lines.svg')).uri;
 
 export interface BrandBackgroundProps {

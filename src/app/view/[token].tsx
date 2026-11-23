@@ -152,11 +152,11 @@ export default function PublicMediaViewer() {
       <View style={styles.cinemaContainer}>
         <StatusBar barStyle="light-content" backgroundColor="#000" />
         <View style={styles.logoContainer}>
-          <Image source={brandAssets.logoSvg} style={{ height: 24, width: 120, tintColor: '#C5C0FF' } as any} resizeMode="contain" />
+          <Image source={brandAssets.logoSvg} style={{ height: 24, width: 120, tintColor: '#FFFFFF' } as any} resizeMode="contain" />
         </View>
         <View style={styles.loadingCenter}>
           <View style={styles.loadingSpinner}>
-            <MaterialCommunityIcons name="loading" size={32} color="#C5C0FF" />
+            <MaterialCommunityIcons name="loading" size={32} color="#FFFFFF" />
           </View>
           <Text style={styles.loadingSubtext}>Preparando tu experiencia de visionado...</Text>
         </View>
@@ -171,7 +171,7 @@ export default function PublicMediaViewer() {
         <StatusBar barStyle="light-content" backgroundColor="#000" />
         <View style={styles.errorContent}>
           <View style={styles.errorIconContainer}>
-            <MaterialCommunityIcons name="link-variant-off" size={40} color="rgba(197, 192, 255, 0.6)" />
+            <MaterialCommunityIcons name="link-variant-off" size={40} color="rgba(255, 255, 255, 0.6)" />
           </View>
           <Text style={styles.errorTitle}>Contenido no disponible</Text>
           <Text style={styles.errorDescription}>{error || 'El recurso no está disponible.'}</Text>
@@ -194,16 +194,17 @@ export default function PublicMediaViewer() {
         <View style={styles.lockCenter}>
           <View style={styles.lockCard}>
             <View style={styles.lockIconContainer}>
-              <MaterialCommunityIcons name="lock-outline" size={28} color="#C5C0FF" />
+              <MaterialCommunityIcons name="lock-outline" size={28} color="#FFFFFF" />
             </View>
             <Text style={styles.lockTitle}>Acceso Protegido</Text>
             <Text style={styles.lockSubtitle}>
               Esta producción de <Text style={{ fontWeight: 'bold' }}>{share.projectName}</Text> está protegida.
             </Text>
             <TextInput
+              accessibilityLabel="Contraseña de acceso"
               style={[styles.pwInput, pwError && styles.pwInputError]}
               placeholder="Contraseña de acceso"
-              placeholderTextColor="rgba(255,255,255,0.35)"
+              placeholderTextColor="rgba(255, 255, 255, 0.55)"
               secureTextEntry
               value={password}
               onChangeText={(text) => { setPassword(text); setPwError(false); }}
@@ -240,7 +241,7 @@ export default function PublicMediaViewer() {
         <MaterialCommunityIcons
           name={isFolder(file.mimeType) ? 'folder-outline' : file.mimeType.startsWith('video/') ? 'filmstrip' : 'image-outline'}
           size={18}
-          color="#C5C0FF"
+          color="#FFFFFF"
         />
       );
     }
@@ -273,7 +274,7 @@ export default function PublicMediaViewer() {
         {/* Header */}
         <View style={styles.folderHeader}>
           <View style={styles.folderHeaderRow}>
-            <MaterialCommunityIcons name="google-drive" size={20} color="#C5C0FF" />
+            <MaterialCommunityIcons name="google-drive" size={20} color="#FFFFFF" />
             <Text style={styles.folderTitle} numberOfLines={1}>{share.folderName || share.displayName}</Text>
           </View>
           <Text style={styles.folderProject}>{share.projectName}</Text>
@@ -342,7 +343,7 @@ export default function PublicMediaViewer() {
             <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingVertical: spacing.sm }}>
               {folderLoading ? (
                 <View style={styles.folderLoadingBox}>
-                  <ActivityIndicator color="#C5C0FF" size="small" />
+                  <ActivityIndicator color="#FFFFFF" size="small" />
                   <Text style={styles.folderLoadingText}>Cargando archivos...</Text>
                 </View>
               ) : folderError ? (
@@ -357,8 +358,8 @@ export default function PublicMediaViewer() {
                       <Text style={styles.folderSectionTitle}>Carpetas ({folders.length})</Text>
                       {folders.map(f => (
                         <Pressable key={f.id} style={styles.folderFileRow} onPress={() => navigateFolder(f)}>
-                          <View style={[styles.folderFileIcon, { backgroundColor: 'rgba(197, 192, 255, 0.12)' }]}>
-                            <MaterialCommunityIcons name="folder-outline" size={20} color="#C5C0FF" />
+                          <View style={[styles.folderFileIcon, { backgroundColor: 'rgba(255, 255, 255, 0.08)' }]}>
+                            <MaterialCommunityIcons name="folder-outline" size={20} color="#FFFFFF" />
                           </View>
                           <View style={{ flex: 1 }}>
                             <Text style={styles.folderFileName}>{f.name}</Text>
@@ -375,14 +376,14 @@ export default function PublicMediaViewer() {
                       <Text style={styles.folderSectionTitle}>Videos ({videoFiles.length})</Text>
                       {videoFiles.map(f => (
                         <Pressable key={f.id} style={styles.folderFileRow} onPress={() => setPreviewFile(f)}>
-                          <View style={[styles.folderFileIcon, { backgroundColor: 'rgba(197, 192, 255, 0.1)' }]}>
+                          <View style={[styles.folderFileIcon, { backgroundColor: 'rgba(255, 255, 255, 0.08)' }]}>
                             <ViewerThumb file={f} />
                           </View>
                           <View style={{ flex: 1 }}>
                             <Text style={styles.folderFileName}>{f.name}</Text>
                             <Text style={styles.folderFileMeta}>Video {f.size ? `• ${formatSize(f.size)}` : ''}</Text>
                           </View>
-                          <MaterialCommunityIcons name="play-circle-outline" size={20} color="rgba(197, 192, 255, 0.6)" />
+                          <MaterialCommunityIcons name="play-circle-outline" size={20} color="rgba(255, 255, 255, 0.6)" />
                         </Pressable>
                       ))}
                     </View>
@@ -439,7 +440,7 @@ export default function PublicMediaViewer() {
         <View style={styles.bottomBar}>
           <View style={styles.bottomBarContent}>
             <View style={styles.bottomLeft}>
-              <Image source={brandAssets.logoSvg} style={{ height: 16, width: 80, tintColor: '#C5C0FF' } as any} resizeMode="contain" />
+              <Image source={brandAssets.logoSvg} style={{ height: 16, width: 80, tintColor: '#FFFFFF' } as any} resizeMode="contain" />
             </View>
             <Text style={styles.bottomCenter}>{brand.footer}</Text>
             <View style={styles.bottomRight}>
@@ -528,7 +529,7 @@ export default function PublicMediaViewer() {
                 style={styles.downloadBtn}
                 onPress={() => { if (Platform.OS === 'web') window.open(share.url, '_blank'); }}
               >
-                <MaterialCommunityIcons name="download" size={16} color="#fff" />
+                <MaterialCommunityIcons name="download" size={16} color="#000" />
                 <Text style={styles.downloadBtnLabel}>Descargar</Text>
               </Pressable>
             )}
@@ -554,7 +555,7 @@ export default function PublicMediaViewer() {
       <View style={styles.bottomBar}>
         <View style={styles.bottomBarContent}>
           <View style={styles.bottomLeft}>
-            <Image source={brandAssets.logoSvg} style={{ height: 16, width: 80, tintColor: '#C5C0FF' } as any} resizeMode="contain" />
+            <Image source={brandAssets.logoSvg} style={{ height: 16, width: 80, tintColor: '#FFFFFF' } as any} resizeMode="contain" />
           </View>
           <Text style={styles.bottomCenter}>{brand.footer}</Text>
           <View style={styles.bottomRight}>
@@ -571,7 +572,7 @@ export default function PublicMediaViewer() {
 const styles = StyleSheet.create({
   cinemaContainer: {
     flex: 1,
-    backgroundColor: '#08080a',
+    backgroundColor: '#060608',
   },
   scrollView: {
     flex: 1,
@@ -617,7 +618,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: 'rgba(197, 192, 255, 0.12)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.sm,
@@ -671,7 +672,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: 'rgba(197, 192, 255, 0.12)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -698,24 +699,25 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   pwInputError: {
-    borderColor: '#C5C0FF',
+    borderColor: '#FFB3C0',
   },
   pwErrorText: {
     ...typography.bodySmall,
-    color: '#C5C0FF',
+    color: '#FFB3C0',
   },
   unlockBtn: {
     width: '100%',
     height: 44,
-    backgroundColor: '#C5C0FF',
-    borderRadius: 4,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    borderTopLeftRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: spacing.xs,
   },
   unlockBtnText: {
     ...typography.labelLarge,
-    color: '#fff',
+    color: '#000',
     fontWeight: 'bold',
     letterSpacing: 0.5,
   },
@@ -775,14 +777,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    backgroundColor: 'rgba(197, 192, 255, 0.85)',
-    borderRadius: 4,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    borderTopLeftRadius: 20,
     paddingHorizontal: spacing.base,
-    height: 36,
+    minHeight: 44,
   },
   downloadBtnLabel: {
     ...typography.labelMedium,
-    color: '#fff',
+    color: '#000',
     fontWeight: 'bold',
   },
 
@@ -882,7 +885,7 @@ const styles = StyleSheet.create({
     maxWidth: 100,
   },
   breadcrumbActive: {
-    color: '#C5C0FF',
+    color: '#FFFFFF',
     fontWeight: '600',
   },
   folderSection: {

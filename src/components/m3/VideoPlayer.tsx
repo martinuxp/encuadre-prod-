@@ -606,7 +606,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   qualityOptionActive: {
-    backgroundColor: 'rgba(197, 192, 255, 0.15)',
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
   },
   qualityOptionText: {
     ...typography.bodyMedium,

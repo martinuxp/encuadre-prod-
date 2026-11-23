@@ -19,7 +19,10 @@ interface AppShellProps {
   onBackPress?: () => void;
   rightActions?: React.ReactNode;
   children: React.ReactNode;
-  /** Fondo de marca: `brand` (portada/inicio), `quiet` (por defecto, atenuado) o `plain` (#060608 liso) */
+  /**
+   * Fondo de marca: `brand` (inicio), `quiet` (atenuado, para listados) o `plain` (#060608 liso, por defecto).
+   * La guía pide fondo liso en formularios y pantallas densas para no cansar ni gastar batería.
+   */
   background?: 'brand' | 'quiet' | 'plain';
 }
 
@@ -29,7 +32,7 @@ export const AppShell: React.FC<AppShellProps> = ({
   onBackPress,
   rightActions,
   children,
-  background = 'quiet',
+  background = 'plain',
 }) => {
   const responsive = useResponsive();
   const router = useRouter();

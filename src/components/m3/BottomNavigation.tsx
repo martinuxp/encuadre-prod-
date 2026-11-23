@@ -27,9 +27,13 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
       {items.map((item) => {
         const isActive = item.key === activeKey;
         return (
-          <Pressable
-            key={item.key}
-            onPress={() => onSelect(item.key)}
+            <Pressable
+              key={item.key}
+              accessibilityRole="link"
+              accessibilityLabel={item.label}
+              accessibilityState={{ selected: isActive }}
+              aria-current={isActive ? 'page' : undefined}
+              onPress={() => onSelect(item.key)}
             style={({ pressed }) => [
               styles.item,
               pressed && styles.pressed,

@@ -583,6 +583,7 @@ export default function FilesScreen() {
                   <Text style={styles.label}>URL del archivo o video</Text>
                   <View style={styles.scanRow}>
                     <TextInput
+                      accessibilityLabel="URL del archivo o video"
                       style={[styles.input, { flex: 1 }]}
                       value={linkUrl}
                       onChangeText={(t) => { setLinkUrl(t); setLinkScanResult(null); }}
@@ -690,6 +691,7 @@ export default function FilesScreen() {
                     <View style={{ flex: 1 }}>
                       <Text style={styles.label}>Número de versión</Text>
                       <TextInput
+                        accessibilityLabel="Número de versión"
                         style={styles.input}
                         value={newVersionNum}
                         onChangeText={setNewVersionNum}
@@ -699,6 +701,7 @@ export default function FilesScreen() {
                     <View style={{ flex: 2 }}>
                       <Text style={styles.label}>Etiqueta / Nombre</Text>
                       <TextInput
+                        accessibilityLabel="Etiqueta / Nombre"
                         style={styles.input}
                         value={newVersionLabel}
                         onChangeText={setNewVersionLabel}
@@ -752,6 +755,7 @@ export default function FilesScreen() {
                     <View style={{ gap: spacing.xs }}>
                       <Text style={styles.label}>URL del Video / Archivo</Text>
                       <TextInput
+                        accessibilityLabel="URL del Video / Archivo"
                         style={styles.input}
                         value={externalUrl}
                         onChangeText={setExternalUrl}
@@ -763,6 +767,7 @@ export default function FilesScreen() {
                   <View style={{ gap: spacing.xs }}>
                     <Text style={styles.label}>Notas de la versión</Text>
                     <TextInput
+                      accessibilityLabel="Notas de la versión"
                       style={[styles.input, styles.textArea]}
                       value={newVersionNotes}
                       onChangeText={setNewVersionNotes}
@@ -824,6 +829,7 @@ export default function FilesScreen() {
                     <View style={{ gap: spacing.xs }}>
                       <Text style={styles.label}>Contraseña de acceso (opcional)</Text>
                       <TextInput
+                        accessibilityLabel="Contraseña de acceso (opcional)"
                         style={styles.input}
                         value={sharePassword}
                         onChangeText={setSharePassword}
@@ -835,6 +841,7 @@ export default function FilesScreen() {
                     <View style={{ gap: spacing.xs }}>
                       <Text style={styles.label}>Expiración en días (opcional)</Text>
                       <TextInput
+                        accessibilityLabel="Expiración en días (opcional)"
                         style={styles.input}
                         value={shareExpiresDays}
                         onChangeText={setShareExpiresDays}
@@ -1164,7 +1171,7 @@ const styles = StyleSheet.create({
   },
   unsupportedPreviewText: {
     ...typography.bodyMedium,
-    color: '#aaa',
+    color: colors.onSurfaceVariant,
     textAlign: 'center',
   },
   openLinkBtn: {

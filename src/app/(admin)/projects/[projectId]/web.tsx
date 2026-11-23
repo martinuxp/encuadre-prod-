@@ -6,6 +6,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Switch, Pressable, Linking, Platform } from 'react-native';
 import { Image } from 'expo-image';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
 import { getDownloadURL, ref } from 'firebase/storage';
@@ -18,7 +19,8 @@ import { ErrorState } from '@/components/m3/ErrorState';
 import { storage } from '@/services/firebase/firebaseConfig';
 import { projectService } from '@/services/firebase/projectService';
 import { webService, WebDraft, validateWebDraft } from '@/services/firebase/webService';
-import { Project, ProjectMember, TalentProfile, WebAction, WebActionIcon, WebCredit, WebCreditMark } from '@/types';
+import { GalleryEditor } from '@/components/web/GalleryEditor';
+import { Project, ProjectMember, TalentProfile, WebAction, WebActionIcon, WebCredit, WebCreditMark, WebGalleryPhoto } from '@/types';
 import {
   slugify, extractYoutubeId, dominantColors, paletteFromDominant, uriToBlob, isHexColor, contrastRatio,
 } from '@/utils/web';
@@ -56,11 +58,12 @@ const Field: React.FC<{ label: string; value: string; onChangeText: (v: string) 
   <View style={styles.field}>
     <Text style={styles.label}>{label}</Text>
     <TextInput
+      accessibilityLabel={label}
       style={[styles.input, multiline && styles.inputMulti, error && styles.inputError]}
       value={value}
       onChangeText={onChangeText}
       placeholder={placeholder}
-      placeholderTextColor={colors.onSurfaceAlpha38}
+      placeholderTextColor={colors.placeholder}
       multiline={multiline}
       autoCapitalize={autoCapitalize}
     />
@@ -71,7 +74,7 @@ const Field: React.FC<{ label: string; value: string; onChangeText: (v: string) 
 const Chips: React.FC<{ options: { key: string; label: string }[]; value?: string; onChange: (key: string) => void }> = ({ options, value, onChange }) => (
   <View style={styles.chips}>
     {options.map((o) => (
-      <Pressable key={o.key} onPress={() => onChange(o.key)} style={[styles.chip, value === o.key && styles.chipActive]}>
+      <Pressable key={o.key} accessibilityRole="button" aria-pressed={value === o.key} onPress={() => onChange(o.key)} style={[styles.chip, value === o.key && styles.chipActive]}>
         <Text style={[styles.chipLabel, value === o.key && styles.chipLabelActive]}>{o.label}</Text>
       </Pressable>
     ))}
@@ -81,15 +84,28 @@ const Chips: React.FC<{ options: { key: string; label: string }[]; value?: strin
 const Toggle: React.FC<{ label: string; value: boolean; onChange: (v: boolean) => void }> = ({ label, value, onChange }) => (
   <View style={styles.toggleRow}>
     <Text style={styles.toggleLabel}>{label}</Text>
-    <Switch value={value} onValueChange={onChange} />
+    <Switch value={value} onValueChange={onChange} accessibilityLabel={label} />
   </View>
 );
 
-const Mini: React.FC<{ label: string; onPress: () => void; disabled?: boolean }> = ({ label, onPress, disabled }) => (
-  <Pressable onPress={onPress} disabled={disabled} style={[styles.mini, disabled && { opacity: 0.35 }]}>
-    <Text style={styles.miniLabel}>{label}</Text>
-  </Pressable>
-);
+// Botones chicos de las listas. Las flechas se dibujan como íconos y se anuncian con su acción.
+const MINI_ICON: Record<string, { icon: keyof typeof MaterialCommunityIcons.glyphMap; a11y: string }> = {
+  '↑': { icon: 'arrow-up', a11y: 'Subir' },
+  '↓': { icon: 'arrow-down', a11y: 'Bajar' },
+  '← X': { icon: 'arrow-left', a11y: 'Mover encuadre a la izquierda' },
+  'X →': { icon: 'arrow-right', a11y: 'Mover encuadre a la derecha' },
+  '↑ Y': { icon: 'arrow-up', a11y: 'Mover encuadre hacia arriba' },
+  'Y ↓': { icon: 'arrow-down', a11y: 'Mover encuadre hacia abajo' },
+};
+
+const Mini: React.FC<{ label: string; onPress: () => void; disabled?: boolean }> = ({ label, onPress, disabled }) => {
+  const glyph = MINI_ICON[label];
+  return (
+    <Pressable accessibilityRole="button" accessibilityLabel={glyph?.a11y ?? label} accessibilityState={{ disabled: !!disabled }} onPress={onPress} disabled={disabled} style={[styles.mini, disabled && { opacity: 0.35 }]}>
+      {glyph ? <MaterialCommunityIcons name={glyph.icon} size={18} color={colors.onSurface} /> : <Text style={styles.miniLabel}>{label}</Text>}
+    </Pressable>
+  );
+};
 
 const move = <T,>(list: T[], from: number, to: number): T[] => {
   if (to < 0 || to >= list.length) return list;
@@ -216,6 +232,12 @@ export default function WebTab() {
     await webService.saveWeb(projectId, toSave);
     setDraft(toSave); setDirty(false); setNotice('Guardado. Se verá en la web en unos minutos (caché de 5 min).');
   });
+
+  // La galería se guarda sola; se refleja en el borrador para que "Guardar" no la pise con una copia vieja
+  const saveGallery = async (gallery: WebGalleryPhoto[]) => {
+    const saved = await webService.saveGallery(projectId, gallery);
+    setDraft((d) => (d ? { ...d, gallery: saved } : d));
+  };
 
   const pickHero = () => run('hero', async () => {
     const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 1 });
@@ -361,6 +383,16 @@ export default function WebTab() {
         <ActionsEditor items={draft.homeActions || []} allowPrimary={false} onChange={(homeActions) => set({ homeActions })} />
       </SectionCard>
 
+      {/* Galería: se guarda al instante, aparte del botón Guardar */}
+      <SectionCard title="Galería" subtitle="Fotogramas y fotos de rodaje que muestra la página del proyecto.">
+        <GalleryEditor
+          projectId={projectId}
+          bucket={String(storage.app.options.storageBucket || '')}
+          gallery={draft.gallery || []}
+          onSave={saveGallery}
+        />
+      </SectionCard>
+
       {/* 7. Créditos */}
       <SectionCard title="Créditos">
         <Text style={styles.label}>Créditos cortos del inicio (2–3)</Text>
@@ -426,7 +458,7 @@ const styles = StyleSheet.create({
   inputMulti: { minHeight: 96, textAlignVertical: 'top' },
   inputError: { borderColor: colors.error },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  chip: { paddingHorizontal: spacing.md, paddingVertical: spacing.xs, borderRadius: shapes.full, borderWidth: 1, borderColor: colors.outlineVariant },
+  chip: { minHeight: 44, justifyContent: 'center', paddingHorizontal: spacing.md, borderRadius: shapes.small, borderTopRightRadius: 20, borderWidth: 1, borderColor: colors.outlineVariant },
   chipActive: { backgroundColor: colors.secondaryContainer, borderColor: colors.secondaryContainer },
   chipLabel: { ...typography.labelMedium, color: colors.onSurfaceVariant },
   chipLabelActive: { color: colors.onSecondaryContainer, fontWeight: 'bold' },
@@ -435,7 +467,7 @@ const styles = StyleSheet.create({
   inlineRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, alignItems: 'center' },
   rowCard: { backgroundColor: colors.surfaceContainer, borderRadius: shapes.medium, padding: spacing.md, gap: spacing.xs, borderWidth: 1, borderColor: colors.outlineVariant },
   rowButtons: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  mini: { paddingHorizontal: spacing.md, paddingVertical: spacing.xs, borderRadius: shapes.small, backgroundColor: colors.surfaceContainerHighest },
+  mini: { minHeight: 44, minWidth: 44, alignItems: 'center', justifyContent: 'center', paddingHorizontal: spacing.md, borderRadius: shapes.small, backgroundColor: colors.surfaceContainerHighest },
   miniLabel: { ...typography.labelMedium, color: colors.onSurface },
   swatch: { height: 12, borderRadius: shapes.full, borderWidth: 1, borderColor: colors.outlineVariant },
   logoPreview: { width: 160, height: 80, backgroundColor: colors.surfaceContainerLowest, borderRadius: shapes.small },

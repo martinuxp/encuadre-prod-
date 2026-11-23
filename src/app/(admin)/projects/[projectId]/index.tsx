@@ -369,19 +369,19 @@ export default function ProjectDetailScreen() {
             <ScrollView contentContainerStyle={styles.modalBody}>
               <View style={{ gap: spacing.xs }}>
                 <Text style={styles.label}>Nombre del Proyecto</Text>
-                <TextInput style={styles.input} value={editName} onChangeText={setEditName} />
+                <TextInput accessibilityLabel="Nombre del Proyecto" style={styles.input} value={editName} onChangeText={setEditName} />
               </View>
 
               <View style={{ gap: spacing.xs }}>
                 <Text style={styles.label}>Descripción</Text>
-                <TextInput style={[styles.input, styles.textArea]} value={editDesc} onChangeText={setEditDesc} multiline />
+                <TextInput accessibilityLabel="Descripción" style={[styles.input, styles.textArea]} value={editDesc} onChangeText={setEditDesc} multiline />
               </View>
 
               <View style={styles.formRow}>
                 <View style={{ flex: 1, gap: spacing.xs }}>
                   <Text style={styles.label}>Tipo de Producción</Text>
                   {Platform.OS === 'web' ? (
-                    <select
+                    <select aria-label="Tipo de Producción"
                       value={editType}
                       onChange={(e) => setEditType(e.target.value)}
                       style={styles.select as any}
@@ -389,13 +389,13 @@ export default function ProjectDetailScreen() {
                       {PRODUCTION_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                     </select>
                   ) : (
-                    <TextInput style={styles.input} value={editType} onChangeText={setEditType} />
+                    <TextInput accessibilityLabel="Tipo de producción" style={styles.input} value={editType} onChangeText={setEditType} />
                   )}
                 </View>
                 <View style={{ flex: 1, gap: spacing.xs }}>
                   <Text style={styles.label}>Estado</Text>
                   {Platform.OS === 'web' ? (
-                    <select
+                    <select aria-label="Estado"
                       value={editStatus}
                       onChange={(e) => setEditStatus(e.target.value)}
                       style={styles.select as any}
@@ -403,7 +403,7 @@ export default function ProjectDetailScreen() {
                       {PROJECT_STATUSES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
                     </select>
                   ) : (
-                    <TextInput style={styles.input} value={editStatus} onChangeText={setEditStatus} />
+                    <TextInput accessibilityLabel="Estado" style={styles.input} value={editStatus} onChangeText={setEditStatus} />
                   )}
                 </View>
               </View>
@@ -411,17 +411,18 @@ export default function ProjectDetailScreen() {
               <View style={styles.formRow}>
                 <View style={{ flex: 1, gap: spacing.xs }}>
                   <Text style={styles.label}>Inicio (YYYY-MM-DD)</Text>
-                  <TextInput style={styles.input} value={editStartDate} onChangeText={setEditStartDate} placeholder="2026-01-01" />
+                  <TextInput accessibilityLabel="Inicio (YYYY-MM-DD)" style={styles.input} value={editStartDate} onChangeText={setEditStartDate} placeholder="2026-01-01" />
                 </View>
                 <View style={{ flex: 1, gap: spacing.xs }}>
                   <Text style={styles.label}>Término (opcional)</Text>
-                  <TextInput style={styles.input} value={editEndDate} onChangeText={setEditEndDate} placeholder="2026-06-01" />
+                  <TextInput accessibilityLabel="Término (opcional)" style={styles.input} value={editEndDate} onChangeText={setEditEndDate} placeholder="2026-06-01" />
                 </View>
               </View>
 
               <View style={{ gap: spacing.xs }}>
                 <Text style={styles.label}>Google Drive — Carpeta de Crudos</Text>
                 <TextInput
+                  accessibilityLabel="Google Drive — Carpeta de Crudos"
                   style={styles.input}
                   value={editDriveFolder}
                   onChangeText={setEditDriveFolder}

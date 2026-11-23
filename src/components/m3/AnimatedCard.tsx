@@ -47,7 +47,7 @@ export const AnimatedCard: React.FC<AnimatedCardProps> = ({
         pressed && styles.pressed,
         Platform.OS === 'web' && ({
           cursor: 'pointer',
-          transition: 'transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 200ms cubic-bezier(0.2, 0, 0, 1), border-color 200ms cubic-bezier(0.2, 0, 0, 1)',
+          transition: 'transform 300ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 200ms cubic-bezier(0.2, 0, 0, 1), border-color 200ms cubic-bezier(0.2, 0, 0, 1)',
         } as any),
       ]}
     >

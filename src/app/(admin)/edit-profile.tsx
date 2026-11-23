@@ -197,9 +197,10 @@ export default function EditProfileScreen() {
                   <Text style={styles.prefix}>@</Text>
                   <TextInput
                     value={form[field.key]}
+                    accessibilityLabel={field.label}
                     onChangeText={(v) => set(field.key, v.replace(/^@/, ''))}
                     placeholder={field.placeholder}
-                    placeholderTextColor={colors.onSurfaceAlpha38}
+                    placeholderTextColor={colors.placeholder}
                     autoCapitalize="none"
                     autoCorrect={false}
                     style={[
@@ -212,9 +213,10 @@ export default function EditProfileScreen() {
               ) : (
                 <TextInput
                   value={form[field.key]}
+                  accessibilityLabel={field.label}
                   onChangeText={(v) => set(field.key, v)}
                   placeholder={field.placeholder}
-                  placeholderTextColor={colors.onSurfaceAlpha38}
+                  placeholderTextColor={colors.placeholder}
                   keyboardType={field.keyboard ?? 'default'}
                   autoCapitalize={
                     field.keyboard === 'email-address' || field.keyboard === 'phone-pad'

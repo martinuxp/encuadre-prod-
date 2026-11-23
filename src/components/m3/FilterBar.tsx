@@ -36,6 +36,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         return (
           <Pressable
             key={option.key}
+            accessibilityRole="button"
+            aria-pressed={isSelected}
             onPress={() => onSelect(option.key)}
             style={[
               styles.chip,
@@ -67,7 +69,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   chip: {
-    height: 34,
+    minHeight: 44,
     paddingHorizontal: spacing.base,
     borderRadius: shapes.small,
     alignItems: 'center',

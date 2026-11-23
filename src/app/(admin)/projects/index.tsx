@@ -95,7 +95,7 @@ export default function ProjectsListScreen() {
   );
 
   return (
-    <AppShell title="Proyectos" rightActions={headerRight}>
+    <AppShell title="Proyectos" rightActions={headerRight} background="quiet">
       <View style={styles.container}>
         <SectionHeader number={projects.length || '–'} title="Proyectos" subtitle="Producciones de Grupo Encuadre" size="large" />
         {/* Controles de Búsqueda y Filtro */}

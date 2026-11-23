@@ -318,6 +318,7 @@ export default function VersionsScreen() {
                 <View style={{ flex: 1 }}>
                   <Text style={styles.label}>N° de Versión</Text>
                   <TextInput
+                    accessibilityLabel="N° de Versión"
                     style={styles.input}
                     value={newVersionNum}
                     onChangeText={setNewVersionNum}
@@ -327,6 +328,7 @@ export default function VersionsScreen() {
                 <View style={{ flex: 2 }}>
                   <Text style={styles.label}>Etiqueta</Text>
                   <TextInput
+                    accessibilityLabel="Etiqueta"
                     style={styles.input}
                     value={newVersionLabel}
                     onChangeText={setNewVersionLabel}
@@ -404,6 +406,7 @@ export default function VersionsScreen() {
               <View style={{ gap: spacing.xs }}>
                 <Text style={styles.label}>Notas del corte</Text>
                 <TextInput
+                  accessibilityLabel="Notas del corte"
                   style={[styles.input, styles.textArea]}
                   value={newVersionNotes}
                   onChangeText={setNewVersionNotes}
@@ -469,6 +472,7 @@ export default function VersionsScreen() {
                 <View style={{ gap: spacing.xs }}>
                   <Text style={styles.label}>Contraseña (opcional)</Text>
                   <TextInput
+                    accessibilityLabel="Contraseña (opcional)"
                     style={styles.input}
                     value={sharePassword}
                     onChangeText={setSharePassword}
@@ -480,6 +484,7 @@ export default function VersionsScreen() {
                 <View style={{ gap: spacing.xs }}>
                   <Text style={styles.label}>Vencimiento en días (opcional)</Text>
                   <TextInput
+                    accessibilityLabel="Vencimiento en días (opcional)"
                     style={styles.input}
                     value={shareExpiresDays}
                     onChangeText={setShareExpiresDays}
@@ -764,13 +769,13 @@ const styles = StyleSheet.create({
     height: 48,
     borderWidth: 1,
     borderStyle: 'dashed',
-    borderColor: '#1a73e8',
+    borderColor: colors.outline,
     borderRadius: shapes.small,
-    backgroundColor: 'rgba(26,115,232,0.05)',
+    backgroundColor: colors.surfaceContainerLow,
   },
   driveImportText: {
     ...typography.labelLarge,
-    color: '#1a73e8',
+    color: colors.onSurface,
     fontWeight: '600',
   },
   previewContent: {

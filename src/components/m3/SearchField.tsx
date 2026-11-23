@@ -37,10 +37,12 @@ export const SearchField: React.FC<SearchFieldProps> = ({
         style={styles.searchIcon}
       />
       <TextInput
+        accessibilityLabel={placeholder || 'Buscar'}
+        accessibilityRole="search"
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor={colors.onSurfaceAlpha38}
+        placeholderTextColor={colors.placeholder}
         style={[
           styles.input,
           Platform.OS === 'web' && { outlineStyle: 'none' } as any, // Quita el contorno web por defecto
@@ -49,6 +51,7 @@ export const SearchField: React.FC<SearchFieldProps> = ({
       {value.length > 0 && (
         <IconButton
           icon="close"
+          accessibilityLabel="Borrar búsqueda"
           size={18}
           variant="standard"
           onPress={handleClear}

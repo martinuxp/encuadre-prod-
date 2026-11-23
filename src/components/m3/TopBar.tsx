@@ -42,6 +42,7 @@ export const TopBar: React.FC<TopBarProps> = ({
         {showBack ? (
           <IconButton
             icon="arrow-left"
+            accessibilityLabel="Volver"
             variant="standard"
             onPress={handleBack}
             style={styles.backBtn}

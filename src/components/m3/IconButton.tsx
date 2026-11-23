@@ -7,11 +7,14 @@ import { Pressable, Animated, StyleSheet, ViewStyle, Platform, ActivityIndicator
 import { colors, shapes, spacing } from '@/theme/tokens';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ease, duration, scale } from '@/theme/animation';
+import { isReducedMotion } from '@/hooks/useReducedMotion';
 
 export type IconButtonVariant = 'standard' | 'filled' | 'tonal' | 'outlined';
 
 interface IconButtonProps {
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  /** Nombre que anuncia el lector de pantalla (el botón no tiene texto visible) */
+  accessibilityLabel: string;
   onPress: () => void;
   variant?: IconButtonVariant;
   size?: number;
@@ -23,6 +26,7 @@ interface IconButtonProps {
 
 export const IconButton: React.FC<IconButtonProps> = ({
   icon,
+  accessibilityLabel,
   onPress,
   variant = 'standard',
   size = 24,
@@ -36,25 +40,27 @@ export const IconButton: React.FC<IconButtonProps> = ({
       case 'filled':
         return {
           container: {
-            backgroundColor: colors.primary,
+            backgroundColor: '#FFFFFF',
           },
-          color: iconColor || colors.onPrimary,
+          color: iconColor || '#000000',
         };
       case 'tonal':
         return {
           container: {
-            backgroundColor: colors.secondaryContainer,
+            backgroundColor: 'rgba(255, 255, 255, 0.08)',
+            borderWidth: 1.5,
+            borderColor: colors.outlineVariant,
           },
-          color: iconColor || colors.onSecondaryContainer,
+          color: iconColor || colors.onSurface,
         };
       case 'outlined':
         return {
           container: {
             backgroundColor: 'transparent',
-            borderWidth: 1,
-            borderColor: colors.outline,
+            borderWidth: 2,
+            borderColor: iconColor || colors.onSurface,
           },
-          color: iconColor || colors.primary,
+          color: iconColor || colors.onSurface,
         };
       case 'standard':
       default:
@@ -68,10 +74,12 @@ export const IconButton: React.FC<IconButtonProps> = ({
   };
 
   const vStyles = getVariantStyles();
-  const containerSize = size + 16; // Padding alrededor del icono
+  // Objetivo táctil mínimo de 44 px aunque el ícono sea chico
+  const containerSize = Math.max(44, size + 16);
   const scaleAnim = React.useRef(new Animated.Value(scale.rest)).current;
 
   const animateTo = (toValue: number, useSpring: boolean) => {
+    if (isReducedMotion()) return;
     Animated.timing(scaleAnim, {
       toValue,
       duration: useSpring ? duration.short4 : duration.short2,
@@ -82,6 +90,9 @@ export const IconButton: React.FC<IconButtonProps> = ({
 
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
       onPress={onPress}
       onPressIn={() => animateTo(scale.pressedSmall, false)}
       onPressOut={() => animateTo(scale.rest, true)}
@@ -92,7 +103,8 @@ export const IconButton: React.FC<IconButtonProps> = ({
         {
           width: containerSize,
           height: containerSize,
-          borderRadius: containerSize / 2,
+          // Radio base de la marca en vez de círculo
+          borderRadius: 10,
         },
         pressed && styles.pressed,
         disabled && styles.disabled,

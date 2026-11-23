@@ -513,16 +513,17 @@ export default function TeamScreen() {
                   Selecciona actores o miembros del equipo para sumarlos a este proyecto.
                 </Text>
               </View>
-              <IconButton icon="close" variant="standard" onPress={() => setImportModalVisible(false)} />
+              <IconButton icon="close" accessibilityLabel="Cerrar" variant="standard" onPress={() => setImportModalVisible(false)} />
             </View>
 
             {/* Buscador en libreta */}
             <View style={styles.importSearchRow}>
               <TextInput
+                accessibilityLabel="Buscar por nombre, rol o departamento"
                 value={importSearch}
                 onChangeText={setImportSearch}
                 placeholder="Buscar por nombre, rol o departamento..."
-                placeholderTextColor={colors.onSurfaceAlpha38}
+                placeholderTextColor={colors.placeholder}
                 style={[styles.input, { flex: 1 }, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
               />
             </View>
@@ -633,10 +634,11 @@ export default function TeamScreen() {
                 <View key={field.label} style={styles.inputGroup}>
                   <Text style={styles.inputLabel}>{field.label}</Text>
                   <TextInput
+                    accessibilityLabel={field.label.replace(' *', '')}
                     value={field.value}
                     onChangeText={field.set}
                     placeholder={field.placeholder}
-                    placeholderTextColor={colors.onSurfaceAlpha38}
+                    placeholderTextColor={colors.placeholder}
                     style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]}
                   />
                 </View>
@@ -681,7 +683,7 @@ export default function TeamScreen() {
                     {generatedLink ? 'Copia y comparte el link con el participante.' : 'Configura el llamado individual para este participante.'}
                   </Text>
                 </View>
-                <IconButton icon="close" variant="standard" onPress={() => setCallSheetModalVisible(false)} />
+                <IconButton icon="close" accessibilityLabel="Cerrar" variant="standard" onPress={() => setCallSheetModalVisible(false)} />
               </View>
 
               {/* ── LINK GENERADO ── */}
@@ -727,15 +729,15 @@ export default function TeamScreen() {
                     <View style={styles.row}>
                       <View style={[styles.inputGroup, { flex: 1 }]}>
                         <Text style={styles.inputLabel}>Fecha del rodaje *</Text>
-                        <TextInput value={form.callDate} onChangeText={(v) => setForm({ ...form, callDate: v })} placeholder="YYYY-MM-DD" placeholderTextColor={colors.onSurfaceAlpha38} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
+                        <TextInput accessibilityLabel="Fecha del rodaje" value={form.callDate} onChangeText={(v) => setForm({ ...form, callDate: v })} placeholder="YYYY-MM-DD" placeholderTextColor={colors.placeholder} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
                       </View>
                       <View style={[styles.inputGroup, { flex: 1 }]}>
                         <Text style={styles.inputLabel}>Hora de llamado *</Text>
-                        <TextInput value={form.callTime} onChangeText={(v) => setForm({ ...form, callTime: v })} placeholder="HH:MM" placeholderTextColor={colors.onSurfaceAlpha38} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
+                        <TextInput accessibilityLabel="Hora de llamado" value={form.callTime} onChangeText={(v) => setForm({ ...form, callTime: v })} placeholder="HH:MM" placeholderTextColor={colors.placeholder} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
                       </View>
                       <View style={[styles.inputGroup, { flex: 1 }]}>
                         <Text style={styles.inputLabel}>Hora de llegada</Text>
-                        <TextInput value={form.arrivalTime} onChangeText={(v) => setForm({ ...form, arrivalTime: v })} placeholder="HH:MM" placeholderTextColor={colors.onSurfaceAlpha38} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
+                        <TextInput accessibilityLabel="Hora de llegada" value={form.arrivalTime} onChangeText={(v) => setForm({ ...form, arrivalTime: v })} placeholder="HH:MM" placeholderTextColor={colors.placeholder} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
                       </View>
                     </View>
                   </View>
@@ -744,11 +746,11 @@ export default function TeamScreen() {
                     <Text style={styles.formSectionTitle}>📍 Locación</Text>
                     <View style={styles.inputGroup}>
                       <Text style={styles.inputLabel}>Nombre del set / locación *</Text>
-                      <TextInput value={form.locationName} onChangeText={(v) => setForm({ ...form, locationName: v })} placeholder="Ej. Estudio Central / Casa Protagonista" placeholderTextColor={colors.onSurfaceAlpha38} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
+                      <TextInput accessibilityLabel="Nombre del set / locación" value={form.locationName} onChangeText={(v) => setForm({ ...form, locationName: v })} placeholder="Ej. Estudio Central / Casa Protagonista" placeholderTextColor={colors.placeholder} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
                     </View>
                     <View style={styles.inputGroup}>
                       <Text style={styles.inputLabel}>Dirección completa *</Text>
-                      <TextInput value={form.locationAddress} onChangeText={(v) => setForm({ ...form, locationAddress: v })} placeholder="Ej. Av. Providencia 1234, Santiago" placeholderTextColor={colors.onSurfaceAlpha38} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
+                      <TextInput accessibilityLabel="Dirección completa" value={form.locationAddress} onChangeText={(v) => setForm({ ...form, locationAddress: v })} placeholder="Ej. Av. Providencia 1234, Santiago" placeholderTextColor={colors.placeholder} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
                     </View>
                   </View>
 
@@ -757,11 +759,11 @@ export default function TeamScreen() {
                     <View style={styles.row}>
                       <View style={[styles.inputGroup, { flex: 1 }]}>
                         <Text style={styles.inputLabel}>Rol / Cargo *</Text>
-                        <TextInput value={form.role} onChangeText={(v) => setForm({ ...form, role: v })} placeholder="Ej. DF, Actor Principal" placeholderTextColor={colors.onSurfaceAlpha38} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
+                        <TextInput accessibilityLabel="Rol / Cargo" value={form.role} onChangeText={(v) => setForm({ ...form, role: v })} placeholder="Ej. DF, Actor Principal" placeholderTextColor={colors.placeholder} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
                       </View>
                       <View style={[styles.inputGroup, { flex: 1 }]}>
                         <Text style={styles.inputLabel}>Vestuario</Text>
-                        <TextInput value={form.costume} onChangeText={(v) => setForm({ ...form, costume: v })} placeholder="Ej. Casual oscuro, traje formal" placeholderTextColor={colors.onSurfaceAlpha38} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
+                        <TextInput accessibilityLabel="Vestuario" value={form.costume} onChangeText={(v) => setForm({ ...form, costume: v })} placeholder="Ej. Casual oscuro, traje formal" placeholderTextColor={colors.placeholder} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
                       </View>
                     </View>
                   </View>
@@ -770,11 +772,11 @@ export default function TeamScreen() {
                     <Text style={styles.formSectionTitle}>📋 Instrucciones</Text>
                     <View style={styles.inputGroup}>
                       <Text style={styles.inputLabel}>Instrucciones para el participante</Text>
-                      <TextInput value={form.instructions} onChangeText={(v) => setForm({ ...form, instructions: v })} placeholder="Indicaciones especiales, materiales a traer, etc." placeholderTextColor={colors.onSurfaceAlpha38} multiline numberOfLines={3} style={[styles.input, styles.textarea, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
+                      <TextInput accessibilityLabel="Instrucciones para el participante" value={form.instructions} onChangeText={(v) => setForm({ ...form, instructions: v })} placeholder="Indicaciones especiales, materiales a traer, etc." placeholderTextColor={colors.placeholder} multiline numberOfLines={3} style={[styles.input, styles.textarea, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
                     </View>
                     <View style={styles.inputGroup}>
                       <Text style={styles.inputLabel}>Notas internas</Text>
-                      <TextInput value={form.notes} onChangeText={(v) => setForm({ ...form, notes: v })} placeholder="Notas internas de producción (no visibles al participante)" placeholderTextColor={colors.onSurfaceAlpha38} multiline numberOfLines={2} style={[styles.input, styles.textarea, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
+                      <TextInput accessibilityLabel="Notas internas" value={form.notes} onChangeText={(v) => setForm({ ...form, notes: v })} placeholder="Notas internas de producción (no visibles al participante)" placeholderTextColor={colors.placeholder} multiline numberOfLines={2} style={[styles.input, styles.textarea, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
                     </View>
                   </View>
 
@@ -783,11 +785,11 @@ export default function TeamScreen() {
                     <View style={styles.row}>
                       <View style={[styles.inputGroup, { flex: 1 }]}>
                         <Text style={styles.inputLabel}>Nombre del contacto</Text>
-                        <TextInput value={form.contactName} onChangeText={(v) => setForm({ ...form, contactName: v })} placeholder="Nombre del productor en set" placeholderTextColor={colors.onSurfaceAlpha38} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
+                        <TextInput accessibilityLabel="Nombre del contacto" value={form.contactName} onChangeText={(v) => setForm({ ...form, contactName: v })} placeholder="Nombre del productor en set" placeholderTextColor={colors.placeholder} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
                       </View>
                       <View style={[styles.inputGroup, { flex: 1 }]}>
                         <Text style={styles.inputLabel}>Teléfono del contacto</Text>
-                        <TextInput value={form.contactPhone} onChangeText={(v) => setForm({ ...form, contactPhone: v })} placeholder="+56 9 xxxx xxxx" placeholderTextColor={colors.onSurfaceAlpha38} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
+                        <TextInput accessibilityLabel="Teléfono del contacto" value={form.contactPhone} onChangeText={(v) => setForm({ ...form, contactPhone: v })} placeholder="+56 9 xxxx xxxx" placeholderTextColor={colors.placeholder} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
                       </View>
                     </View>
                   </View>

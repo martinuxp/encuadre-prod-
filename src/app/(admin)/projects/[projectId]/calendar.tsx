@@ -161,12 +161,12 @@ export default function CalendarScreen() {
             <Text style={styles.modalTitle}>Agregar Evento</Text>
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Título *</Text>
-              <TextInput value={eventTitle} onChangeText={setEventTitle} placeholder="Ej. Jornada de rodaje — escenas interiores" placeholderTextColor={colors.onSurfaceAlpha38} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
+              <TextInput accessibilityLabel="Título" value={eventTitle} onChangeText={setEventTitle} placeholder="Ej. Jornada de rodaje — escenas interiores" placeholderTextColor={colors.placeholder} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
             </View>
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Tipo</Text>
               {Platform.OS === 'web' && (
-                <select value={eventType} onChange={(e) => setEventType(e.target.value as CalendarEventType)} style={{ height: 44, backgroundColor: colors.surfaceContainer, borderRadius: 8, padding: '0 16px', color: colors.onSurface, border: `1px solid ${colors.outlineVariant}` } as any}>
+                <select aria-label="Tipo" value={eventType} onChange={(e) => setEventType(e.target.value as CalendarEventType)} style={{ height: 44, backgroundColor: colors.surfaceContainer, borderRadius: 8, padding: '0 16px', color: colors.onSurface, border: `1px solid ${colors.outlineVariant}` } as any}>
                   <option value="shoot">Rodaje</option>
                   <option value="meeting">Reunión</option>
                   <option value="rehearsal">Ensayo</option>
@@ -179,16 +179,16 @@ export default function CalendarScreen() {
             <View style={styles.row}>
               <View style={[styles.inputGroup, { flex: 1 }]}>
                 <Text style={styles.label}>Inicio *</Text>
-                <TextInput value={eventStart} onChangeText={setEventStart} placeholder="YYYY-MM-DDTHH:MM" placeholderTextColor={colors.onSurfaceAlpha38} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
+                <TextInput accessibilityLabel="Inicio" value={eventStart} onChangeText={setEventStart} placeholder="YYYY-MM-DDTHH:MM" placeholderTextColor={colors.placeholder} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
               </View>
               <View style={[styles.inputGroup, { flex: 1 }]}>
                 <Text style={styles.label}>Término *</Text>
-                <TextInput value={eventEnd} onChangeText={setEventEnd} placeholder="YYYY-MM-DDTHH:MM" placeholderTextColor={colors.onSurfaceAlpha38} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
+                <TextInput accessibilityLabel="Término" value={eventEnd} onChangeText={setEventEnd} placeholder="YYYY-MM-DDTHH:MM" placeholderTextColor={colors.placeholder} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
               </View>
             </View>
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Locación / Dirección</Text>
-              <TextInput value={eventLocation} onChangeText={setEventLocation} placeholder="Ej. Estudio B, Providencia" placeholderTextColor={colors.onSurfaceAlpha38} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
+              <TextInput accessibilityLabel="Locación / Dirección" value={eventLocation} onChangeText={setEventLocation} placeholder="Ej. Estudio B, Providencia" placeholderTextColor={colors.placeholder} style={[styles.input, Platform.OS === 'web' && { outlineStyle: 'none' } as any]} />
             </View>
             <View style={styles.modalActions}>
               <ActionButton label="Cancelar" variant="outlined" onPress={() => setModalVisible(false)} style={styles.modalBtn} />

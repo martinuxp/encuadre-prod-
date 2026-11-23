@@ -1,5 +1,4 @@
-/* Google Sans Flex: única familia del panel (ejes opsz, wdth y wght) */
-@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wdth,wght@6..144,25..151,300..1000&display=swap');
+/* Google Sans Flex (única familia del panel) se carga desde src/app/+html.tsx con preconnect */
 
 /* ═══════════════════════════════════════════════════════
    Encuadre Prod. — Global Styles + Material Design 3 Expressive (M3E)
@@ -99,8 +98,8 @@
   --ease-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
   --ease-emphasized-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
 
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --ease-spring-soft: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring-soft: cubic-bezier(0.16, 1, 0.3, 1);
 
   /* ── Duration Tokens ── */
   --duration-short-1: 50ms;
@@ -245,7 +244,7 @@ a:hover {
 }
 
 .m3e-dialog-card {
-  animation: m3e-dialog-in var(--duration-medium-3) var(--ease-spring) forwards;
+  animation: m3e-dialog-in var(--duration-medium-3) var(--enc-ease) forwards;
   box-shadow: var(--shadow-level-4);
 }
 
@@ -259,7 +258,7 @@ a:hover {
 .m3e-card-interactive:hover {
   transform: translateY(-3px) scale(1.006) !important;
   box-shadow: var(--shadow-level-3) !important;
-  border-color: rgba(197, 192, 255, 0.4) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
 }
 
 .m3e-card-interactive:active {
@@ -343,8 +342,15 @@ html, body { font-family: var(--enc-sans); font-weight: 400; background: #000; c
 ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .18); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, .35); }
 
-/* Campos: el foco se marca con borde blanco (ver EncInput), sin el anillo azul del navegador */
-input:focus, textarea:focus { outline: none; }
+/* Foco visible en todo control. Gana sobre el `outlineStyle: 'none'` que llevan algunos estilos de RN.
+   El anillo se separa 2 px para verse también sobre tarjetas claras teñidas con el color del proyecto. */
+:focus-visible,
+input:focus-visible, textarea:focus-visible, select:focus-visible,
+[role="button"]:focus-visible, [role="tab"]:focus-visible, [role="link"]:focus-visible {
+  outline: 2px solid #fff !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 5px rgba(0, 0, 0, .65);
+}
 
 /* Fondo de marca: manchas noche (arriba-izq) y vino (abajo-der) que se mueven lento.
    El grano va DENTRO del fondo, nunca encima del contenido. */
@@ -372,7 +378,14 @@ input:focus, textarea:focus { outline: none; }
   to   { opacity: 1; transform: none; filter: none; }
 }
 
+/* Reducir movimiento: sin desplazamientos ni escalas, pero se conservan las respuestas
+   de color y opacidad (hover, foco, selección), que dan información y no marean. */
 @media (prefers-reduced-motion: reduce) {
-  .enc-bg__blobs { animation: none; }
-  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  .enc-bg__blobs, .m3e-dialog-card, .m3e-modal-backdrop { animation: none !important; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-property: color, background-color, border-color, opacity, outline-color !important;
+    transition-duration: 150ms !important;
+  }
 }

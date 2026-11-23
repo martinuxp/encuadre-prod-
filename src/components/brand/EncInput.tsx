@@ -24,9 +24,10 @@ export const EncInput: React.FC<EncInputProps> = ({ label, hint, error, corner, 
     <View style={[styles.group, containerStyle]}>
       {label ? <Text style={styles.label}>{label}</Text> : null}
       <TextInput
+        accessibilityLabel={label}
         {...props}
         multiline={multiline}
-        placeholderTextColor="rgba(255, 255, 255, 0.38)"
+        placeholderTextColor="rgba(255, 255, 255, 0.55)"
         onFocus={(e) => { setFocused(true); onFocus?.(e); }}
         onBlur={(e) => { setFocused(false); onBlur?.(e); }}
         style={[
