@@ -4,18 +4,22 @@
 //
 // Sin --apply solo muestra qué haría (dry-run). Usa credenciales ADC del proyecto encuadre-prod
 // (gcloud auth application-default login). Vincula por nombre a un proyecto existente o crea uno nuevo.
+// --link slug=projectId (repetible): vincula un proyecto de la web a uno existente con otro nombre.
 // --images: carpeta con estas-hero.png, estas-logo.png, verde-hero.png, verde-logo.svg, pose-hero.jpg, pose-logo.svg
 //           (public/assets/projects/ del repo de la web). Se suben tal cual; conviene volver a subir
 //           la foto desde el panel para obtener el WebP de 2400 px y la miniatura.
 const fs = require('fs');
 const path = require('path');
-const { initializeApp, applicationDefault } = require('../functions/node_modules/firebase-admin/app');
-const { getFirestore, FieldValue } = require('../functions/node_modules/firebase-admin/firestore');
-const { getStorage } = require('../functions/node_modules/firebase-admin/storage');
+// firebase-admin vive en functions/node_modules
+const fnRequire = require('module').createRequire(path.join(__dirname, '../functions/package.json'));
+const { initializeApp, applicationDefault } = fnRequire('firebase-admin/app');
+const { getFirestore, FieldValue } = fnRequire('firebase-admin/firestore');
+const { getStorage } = fnRequire('firebase-admin/storage');
 
 const args = process.argv.slice(2);
 const file = args.find((a) => !a.startsWith('--') && a.endsWith('.json'));
 const apply = args.includes('--apply');
+const links = Object.fromEntries(args.flatMap((a, i) => (args[i - 1] === '--link' ? [a.split('=')] : [])));
 const imagesDir = args.includes('--images') ? args[args.indexOf('--images') + 1] : null;
 if (!file) { console.error('Uso: node scripts/migrate-web-projects.js <proyectos-actuales.json> [--images <carpeta>] [--apply]'); process.exit(1); }
 
@@ -41,7 +45,7 @@ async function uploadImage(projectId, webPath, name) {
   const existing = (await db.collection('projects').get()).docs.filter((d) => d.data().deleted !== true);
   for (const item of items) {
     const { hero, logo, ...web } = item;
-    const match = existing.find((d) => norm(String(d.data().name || '')) === norm(item.title) || norm(String(d.data().name || '')) === norm(item.slug));
+    const match = (links[item.slug] && existing.find((d) => d.id === links[item.slug])) || existing.find((d) => norm(String(d.data().name || '')) === norm(item.title) || norm(String(d.data().name || '')) === norm(item.slug));
     console.log(`\n${item.title}: ${match ? `vincula a ${match.id}` : 'crea proyecto nuevo'}`);
     const ref = match ? match.ref : db.collection('projects').doc();
     const heroPath = await uploadImage(ref.id, hero, 'hero');
