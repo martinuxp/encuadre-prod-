@@ -10,6 +10,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
 import crypto from 'node:crypto';
+import { registerPublicWebRoutes } from './publicWeb';
 
 setGlobalOptions({ region: 'us-central1', maxInstances: 10 });
 if (!getApps().length) initializeApp();
@@ -484,6 +485,9 @@ app.post('/mcp', rateLimit, async (req, res, next) => {
 
 app.get('/mcp', (_req, res) => res.status(405).json({ error: 'method_not_allowed', message: 'Use POST for MCP requests.' }));
 app.delete('/mcp', (_req, res) => res.status(405).json({ error: 'method_not_allowed', message: 'Use POST for MCP requests.' }));
+
+// Web pública: ruta sin sesión y de solo lectura. Debe registrarse antes del middleware de autenticación de /api.
+registerPublicWebRoutes(app, { db, bucketName: bucket.name });
 
 app.use('/api', rateLimit, (req, res, next) => {
   // Estas rutas inician o aprueban una conexión; las rutas de datos requieren sesión temporal.

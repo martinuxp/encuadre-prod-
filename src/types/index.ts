@@ -142,6 +142,63 @@ export interface Project extends BaseEntity {
   metadata: Record<string, unknown>;
   /** ID de la carpeta de Google Drive para crudos */
   driveFolderId?: string;
+  /** Ficha de la web pública (ver SPEC-panel-web-publica.md) */
+  web?: ProjectWeb;
+}
+
+// ── Web pública ──
+
+export type WebActionIcon = 'play' | 'instagram' | 'arrow-up-right' | 'arrow-right';
+
+export interface WebAction {
+  label: string;
+  href: string;
+  icon: WebActionIcon;
+  primary?: boolean;
+}
+
+export interface WebCredit {
+  role: string;
+  name: string;
+  wide?: boolean;
+}
+
+/** Marca de una persona del equipo para los créditos de la web */
+export interface WebCreditMark {
+  show: boolean;
+  /** Rol público; si falta se usa `role` */
+  role?: string;
+  order?: number;
+}
+
+export interface ProjectWeb {
+  published: boolean;
+  order: number;
+  slug: string;
+  title: string;
+  kind: string;
+  status: string;
+  award?: boolean;
+  colors: { bg: string; ink: string; accent: string; soft: string };
+  heroPath?: string;
+  heroThumbPath?: string;
+  logoPath?: string;
+  heroPos?: string;
+  heroMobileAr?: string;
+  heroLayout?: 'full' | 'stack';
+  typeLogo?: { top: string; mid: string; bottom: string };
+  summary: string;
+  synopsis?: string;
+  description?: string[];
+  note?: string;
+  soon?: string;
+  youtube?: string;
+  actions?: WebAction[];
+  homeActions?: WebAction[];
+  homeCredits: WebCredit[];
+  credits?: WebCredit[];
+  creditsSource?: 'manual' | 'crew';
+  updatedAt?: Date;
 }
 
 /** Miembro del equipo técnico (Crew) */
@@ -153,6 +210,7 @@ export interface ProjectMember extends ProjectEntity {
   role: string;
   department: string;
   permissions: Permission[];
+  webCredit?: WebCreditMark;
 }
 
 /** Perfil de talento / elenco */
@@ -164,6 +222,7 @@ export interface TalentProfile extends ProjectEntity {
   phone?: string;
   agency?: string;
   notes: string;
+  webCredit?: WebCreditMark;
 }
 
 /** Ubicación geográfica para el set */

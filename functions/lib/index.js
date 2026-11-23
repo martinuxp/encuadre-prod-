@@ -16,6 +16,7 @@ const mcp_js_1 = require("@modelcontextprotocol/sdk/server/mcp.js");
 const streamableHttp_js_1 = require("@modelcontextprotocol/sdk/server/streamableHttp.js");
 const zod_1 = require("zod");
 const node_crypto_1 = __importDefault(require("node:crypto"));
+const publicWeb_1 = require("./publicWeb");
 (0, options_1.setGlobalOptions)({ region: 'us-central1', maxInstances: 10 });
 if (!(0, app_1.getApps)().length)
     (0, app_1.initializeApp)();
@@ -585,6 +586,8 @@ app.post('/mcp', rateLimit, async (req, res, next) => {
 });
 app.get('/mcp', (_req, res) => res.status(405).json({ error: 'method_not_allowed', message: 'Use POST for MCP requests.' }));
 app.delete('/mcp', (_req, res) => res.status(405).json({ error: 'method_not_allowed', message: 'Use POST for MCP requests.' }));
+// Web pública: ruta sin sesión y de solo lectura. Debe registrarse antes del middleware de autenticación de /api.
+(0, publicWeb_1.registerPublicWebRoutes)(app, { db, bucketName: bucket.name });
 app.use('/api', rateLimit, (req, res, next) => {
     // Estas rutas inician o aprueban una conexión; las rutas de datos requieren sesión temporal.
     if (req.path === '/auth/connect' || req.path.startsWith('/auth/connect/') || req.path === '/auth/agent/approve' || req.path.startsWith('/mcp/authorize/') || req.path.startsWith('/mcp/operations/'))

@@ -76,12 +76,20 @@ export default function ProjectsListScreen() {
   };
 
   const headerRight = (
-    <ActionButton
-      label="Nuevo Proyecto"
-      variant="filled"
-      icon="plus"
-      onPress={handleCreateProject}
-    />
+    <View style={{ flexDirection: 'row', gap: spacing.sm }}>
+      <ActionButton
+        label="Web pública"
+        variant="outlined"
+        icon="web"
+        onPress={() => router.push('/projects/web')}
+      />
+      <ActionButton
+        label="Nuevo Proyecto"
+        variant="filled"
+        icon="plus"
+        onPress={handleCreateProject}
+      />
+    </View>
   );
 
   return (

@@ -59,6 +59,7 @@ export default function ProjectDetailLayout() {
     { key: 'calendar', label: 'Calendario', icon: 'calendar-outline' },
     { key: 'files', label: 'Archivos', icon: 'file-cabinet' },
     { key: 'versions', label: 'Versiones', icon: 'filmstrip' },
+    { key: 'web', label: 'Web pública', icon: 'web' },
     { key: 'activity', label: 'Historial', icon: 'history' },
   ];
 
