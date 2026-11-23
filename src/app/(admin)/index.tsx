@@ -4,14 +4,14 @@
 // ═══════════════════════════════════════════════════════
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
-import { colors, typography, spacing, shapes } from '@/theme/tokens';
+import { View, Text, StyleSheet } from 'react-native';
+import { colors, typography, spacing, corners } from '@/theme/tokens';
 import { brand } from '@/constants/brand';
 import { AppShell } from '@/components/m3/AppShell';
-import { InfoCard } from '@/components/m3/InfoCard';
 import { ActionButton } from '@/components/m3/ActionButton';
 import { ProjectCard } from '@/components/m3/ProjectCard';
-import { StatusChip } from '@/components/m3/StatusChip';
+import { SectionHeader } from '@/components/brand/SectionHeader';
+import { Reveal } from '@/components/brand/Reveal';
 import { EmptyState } from '@/components/m3/EmptyState';
 import { LoadingState } from '@/components/m3/LoadingState';
 import { projectService } from '@/services/firebase/projectService';
@@ -34,7 +34,7 @@ export default function DashboardScreen() {
     try {
       setLoading(true);
       const allProjects = await projectService.getProjects();
-      setProjects(allProjects.slice(0, 3)); // Mostrar los 3 más recientes
+      setProjects(allProjects);
 
       // Recopilar bitácora reciente si hay proyectos
       if (allProjects.length > 0) {
@@ -61,138 +61,96 @@ export default function DashboardScreen() {
     router.replace('/(auth)/login');
   };
 
-  // KPIs
-  const activeProjectsCount = projects.filter((p) => p.status === 'production').length;
-  const preProjectsCount = projects.filter((p) => p.status === 'pre_production').length;
+  // Indicadores sobre todos los proyectos activos; la lista muestra los 3 más recientes
+  const recent = projects.slice(0, 3);
+  const stats = [
+    { value: projects.filter((p) => p.status === 'production').length, label: 'En rodaje' },
+    { value: projects.filter((p) => p.status === 'pre_production').length, label: 'En preproducción' },
+    { value: projects.filter((p) => p.web?.published).length, label: 'En la web' },
+    { value: projects.length, label: 'Proyectos activos' },
+  ];
 
   const headerRight = (
-    <ActionButton
-      label="Cerrar Sesión"
-      variant="text"
-      icon="logout"
-      onPress={handleLogout}
-      labelStyle={{ color: colors.error }}
-    />
+    <ActionButton label="Cerrar sesión" variant="text" icon="logout" onPress={handleLogout} />
   );
 
   return (
-    <AppShell title={brand.appTitleMedium} rightActions={headerRight}>
+    <AppShell title="" rightActions={headerRight} background="brand">
       <View style={styles.container}>
         {/* Bienvenida */}
         <View style={styles.welcomeSection}>
-          <Text style={styles.greeting}>Hola, {user?.firstName || 'Administrador'}</Text>
-          <Text style={styles.subtitle}>Gestiona tus llamados, guiones y rodajes de {brand.companyMedium}.</Text>
+          <Reveal index={0}><Text style={styles.kicker}>/{brand.appTitleShort}/</Text></Reveal>
+          <Reveal index={1}><Text style={styles.greeting}>Hola, {user?.firstName || 'equipo'}</Text></Reveal>
+          <Reveal index={2}><Text style={styles.subtitle}>Llamados, guiones y rodajes de {brand.companyMedium}, en un solo lugar.</Text></Reveal>
         </View>
 
-        {/* Indicadores KPIs */}
-        <View style={styles.kpisRow}>
-          <InfoCard title="En Rodaje" variant="filled" style={styles.kpiCard}>
-            <View style={styles.kpiValueRow}>
-              <Text style={styles.kpiValue}>{activeProjectsCount}</Text>
-              <MaterialCommunityIcons name="camera-gopro" size={32} color={colors.primary} />
+        {/* Indicadores */}
+        <Reveal index={3} style={styles.stats}>
+          {stats.map((stat, i) => (
+            <View key={stat.label} style={[styles.stat, i === 0 && styles.statFirst, i === stats.length - 1 && styles.statLast]}>
+              <Text style={styles.statValue}>{loading ? '–' : stat.value}</Text>
+              <Text style={styles.statLabel}>{stat.label}</Text>
             </View>
-            <Text style={styles.kpiLabel}>Proyectos en filmación</Text>
-          </InfoCard>
-
-          <InfoCard title="Pre-Producción" variant="filled" style={styles.kpiCard}>
-            <View style={styles.kpiValueRow}>
-              <Text style={styles.kpiValue}>{preProjectsCount}</Text>
-              <MaterialCommunityIcons name="clipboard-text-clock" size={32} color={colors.warning} />
-            </View>
-            <Text style={styles.kpiLabel}>Proyectos listos para rodar</Text>
-          </InfoCard>
-
-          <InfoCard title="Total Proyectos" variant="filled" style={styles.kpiCard}>
-            <View style={styles.kpiValueRow}>
-              <Text style={styles.kpiValue}>{projects.length}</Text>
-              <MaterialCommunityIcons name="folder-multiple" size={32} color={colors.secondary} />
-            </View>
-            <Text style={styles.kpiLabel}>Proyectos registrados</Text>
-          </InfoCard>
-        </View>
+          ))}
+        </Reveal>
 
         {/* Bloque central de contenido */}
         <View style={styles.mainLayout}>
-          {/* Columna Izquierda: Proyectos */}
-          <View style={styles.leftCol}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Proyectos Recientes</Text>
-              <ActionButton
-                label="Ver todos"
-                variant="text"
-                onPress={() => router.push('/projects')}
-              />
-            </View>
+          {/* Columna izquierda: proyectos */}
+          <Reveal index={4} style={styles.leftCol}>
+            <SectionHeader
+              number={1}
+              title="Proyectos recientes"
+              right={<ActionButton label="Ver todos" variant="text" icon="arrow-right" onPress={() => router.push('/projects')} />}
+            />
 
             {loading ? (
               <LoadingState message="Cargando proyectos..." />
-            ) : projects.length === 0 ? (
+            ) : recent.length === 0 ? (
               <EmptyState
                 icon="video-off-outline"
-                title="No hay proyectos"
-                description="Comienza creando tu primer proyecto audiovisual para configurar llamados."
-                actionLabel="Crear Proyecto"
+                mascot="flan"
+                title="Aún no hay proyectos"
+                description="Crea el primero para empezar a armar llamados y guiones."
+                actionLabel="Crear proyecto"
                 onActionPress={handleCreateProject}
               />
             ) : (
               <View style={styles.projectsList}>
-                {projects.map((project) => (
-                  <ProjectCard
-                    key={project.id}
-                    project={project}
-                    onPress={() => router.push(`/projects/${project.id}`)}
-                  />
+                {recent.map((project) => (
+                  <ProjectCard key={project.id} project={project} onPress={() => router.push(`/projects/${project.id}`)} />
                 ))}
               </View>
             )}
-          </View>
+          </Reveal>
 
-          {/* Columna Derecha: Accesos rápidos y Actividad */}
-          <View style={styles.rightCol}>
-            <Text style={styles.sectionTitle}>Acciones Rápidas</Text>
+          {/* Columna derecha: accesos rápidos y actividad */}
+          <Reveal index={5} style={styles.rightCol}>
+            <SectionHeader number={2} title="Atajos" />
             <View style={styles.quickActions}>
-              <ActionButton
-                label="Crear Nuevo Proyecto"
-                onPress={handleCreateProject}
-                variant="filled"
-                icon="plus"
-                style={styles.quickActionBtn}
-              />
-              <ActionButton
-                label="Libreta de Contactos"
-                onPress={() => router.push('/contacts' as any)}
-                variant="tonal"
-                icon="card-account-phone-outline"
-                style={styles.quickActionBtn}
-              />
-              <ActionButton
-                label="Ver Plantillas"
-                onPress={() => router.push('/templates')}
-                variant="outlined"
-                icon="animation"
-                style={styles.quickActionBtn}
-              />
+              <ActionButton label="Nuevo proyecto" onPress={handleCreateProject} variant="filled" icon="plus" style={styles.quickActionBtn} />
+              <ActionButton label="Contactos" onPress={() => router.push('/contacts' as any)} variant="outlined" icon="card-account-phone-outline" style={styles.quickActionBtn} />
+              <ActionButton label="Web pública" onPress={() => router.push('/projects/web')} variant="outlined" icon="web" style={styles.quickActionBtn} />
+              <ActionButton label="Plantillas" onPress={() => router.push('/templates')} variant="tonal" icon="animation" style={styles.quickActionBtn} />
             </View>
 
-            <Text style={[styles.sectionTitle, { marginTop: spacing.xl }]}>Actividad del Portal</Text>
+            <SectionHeader number={3} title="Actividad" style={{ marginTop: spacing.xl }} />
             <View style={styles.activityFeed}>
               {logs.length === 0 ? (
-                <Text style={styles.noActivity}>No hay actividad reciente registrada.</Text>
+                <Text style={styles.noActivity}>Sin actividad reciente.</Text>
               ) : (
                 logs.map((log) => (
                   <View key={log.id} style={styles.activityItem}>
-                    <MaterialCommunityIcons name="history" size={16} color={colors.primary} />
+                    <MaterialCommunityIcons name="history" size={16} color={colors.onSurfaceVariant} />
                     <View style={styles.activityTextContainer}>
                       <Text style={styles.activityUser}>{log.userDisplayName}</Text>
-                      <Text style={styles.activityAction}>
-                        {log.action} en el proyecto
-                      </Text>
+                      <Text style={styles.activityAction}>{log.action}</Text>
                     </View>
                   </View>
                 ))
               )}
             </View>
-          </View>
+          </Reveal>
         </View>
       </View>
     </AppShell>
@@ -200,118 +158,33 @@ export default function DashboardScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    gap: spacing.xl,
+  container: { gap: spacing.xl, paddingVertical: spacing.base },
+  welcomeSection: { gap: spacing.xs },
+  kicker: { ...typography.labelLarge, color: colors.onSurfaceVariant },
+  greeting: { ...typography.displayMedium, color: colors.onSurface },
+  subtitle: { ...typography.titleMedium, fontWeight: '600', color: colors.onSurfaceVariant },
+  stats: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  stat: {
+    flexGrow: 1, flexBasis: 160, paddingVertical: 22, paddingHorizontal: spacing.lg,
+    borderWidth: 2, borderColor: '#FFFFFF', borderRadius: 10, backgroundColor: 'rgba(255, 255, 255, 0.05)',
   },
-  welcomeSection: {
-    gap: spacing.xs,
-  },
-  greeting: {
-    ...typography.displaySmall,
-    color: colors.onSurface,
-    fontWeight: 'bold',
-  },
-  subtitle: {
-    ...typography.bodyLarge,
-    color: colors.onSurfaceVariant,
-  },
-  kpisRow: {
-    flexDirection: 'row',
-    gap: spacing.base,
-    flexWrap: 'wrap',
-  },
-  kpiCard: {
-    flex: 1,
-    minWidth: 200,
-    padding: spacing.base,
-  },
-  kpiValueRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing.xs,
-  },
-  kpiValue: {
-    ...typography.displayLarge,
-    color: colors.onSurface,
-    fontWeight: 'bold',
-  },
-  kpiLabel: {
-    ...typography.bodySmall,
-    color: colors.onSurfaceVariant,
-  },
-  mainLayout: {
-    flexDirection: 'row',
-    gap: spacing.xl,
-    flexWrap: 'wrap',
-  },
-  leftCol: {
-    flex: 2,
-    minWidth: 320,
-    gap: spacing.base,
-  },
-  rightCol: {
-    flex: 1,
-    minWidth: 280,
-    gap: spacing.base,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  sectionTitle: {
-    ...typography.titleLarge,
-    color: colors.onSurface,
-    fontWeight: 'bold',
-  },
-  projectsList: {
-    gap: spacing.base,
-  },
-  quickActions: {
-    gap: spacing.sm,
-    backgroundColor: colors.surfaceContainerLow,
-    padding: spacing.base,
-    borderRadius: shapes.medium,
-    borderWidth: 1,
-    borderColor: colors.outlineVariant,
-  },
-  quickActionBtn: {
-    justifyContent: 'flex-start',
-  },
+  statFirst: { borderTopLeftRadius: 40 },
+  statLast: { borderBottomRightRadius: 40 },
+  statValue: { ...typography.displayMedium, fontSize: 56, lineHeight: 58, color: colors.onSurface },
+  statLabel: { ...typography.bodyLarge, color: colors.onSurfaceVariant },
+  mainLayout: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xl },
+  leftCol: { flex: 2, minWidth: 320, gap: spacing.base },
+  rightCol: { flex: 1, minWidth: 280, gap: spacing.base },
+  projectsList: { gap: spacing.base },
+  quickActions: { gap: spacing.sm },
+  quickActionBtn: { height: 48, justifyContent: 'flex-start' },
   activityFeed: {
-    backgroundColor: colors.surfaceContainerLow,
-    padding: spacing.base,
-    borderRadius: shapes.medium,
-    borderWidth: 1,
-    borderColor: colors.outlineVariant,
-    gap: spacing.sm,
+    backgroundColor: colors.surfaceContainerLow, borderWidth: 1.5, borderColor: colors.outlineVariant,
+    ...corners.tail, padding: spacing.base, gap: spacing.md,
   },
-  noActivity: {
-    ...typography.bodyMedium,
-    color: colors.onSurfaceVariant,
-    textAlign: 'center',
-    paddingVertical: spacing.base,
-  },
-  activityItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.outlineVariant,
-    paddingBottom: spacing.sm,
-  },
-  activityTextContainer: {
-    flex: 1,
-  },
-  activityUser: {
-    ...typography.labelMedium,
-    color: colors.onSurface,
-    fontWeight: 'bold',
-  },
-  activityAction: {
-    ...typography.bodySmall,
-    color: colors.onSurfaceVariant,
-    marginTop: 2,
-  },
+  noActivity: { ...typography.bodyMedium, color: colors.onSurfaceVariant },
+  activityItem: { flexDirection: 'row', gap: spacing.sm, alignItems: 'flex-start' },
+  activityTextContainer: { flex: 1 },
+  activityUser: { ...typography.labelLarge, color: colors.onSurface },
+  activityAction: { ...typography.bodySmall, color: colors.onSurfaceVariant },
 });

@@ -4,11 +4,14 @@
 // ═══════════════════════════════════════════════════════
 
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, Platform } from 'react-native';
-import { colors, typography, shapes, spacing } from '@/theme/tokens';
+import { View, Text, StyleSheet, ScrollView, Platform, useWindowDimensions } from 'react-native';
+import { Image } from 'expo-image';
+import { colors, typography, spacing, corners } from '@/theme/tokens';
 import { brand, brandAssets } from '@/constants/brand';
 import { ActionButton } from '@/components/m3/ActionButton';
-import { InfoCard } from '@/components/m3/InfoCard';
+import { BrandBackground } from '@/components/brand/BrandBackground';
+import { Reveal } from '@/components/brand/Reveal';
+import { EncInput } from '@/components/brand/EncInput';
 import { useSignIn } from '@clerk/clerk-expo';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
@@ -24,11 +27,13 @@ export default function LoginScreen() {
   const [mfaCode, setMfaCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { width } = useWindowDimensions();
+  const wide = width >= 900;
 
   const handleLogin = async () => {
     if (!isLoaded) return;
     if (!email || !password) {
-      setError('Por favor complete todos los campos.');
+      setError('Completa tu correo y contraseña.');
       return;
     }
 
@@ -50,11 +55,11 @@ export default function LoginScreen() {
         setShowMfa(true);
       } else {
         console.warn('Inicio de sesión incompleto:', completeSignIn);
-        setError('El inicio de sesión no se pudo completar. Verifique sus credenciales.');
+        setError('No se pudo completar el inicio de sesión. Revisa tus datos.');
       }
     } catch (err: any) {
       console.error('Error de Clerk Login:', err);
-      setError(err?.errors?.[0]?.message || 'Credenciales inválidas. Intente nuevamente.');
+      setError(err?.errors?.[0]?.message || 'Correo o contraseña incorrectos.');
     } finally {
       setLoading(false);
     }
@@ -79,7 +84,7 @@ export default function LoginScreen() {
       }
     } catch (err: any) {
       console.error('Error al verificar MFA:', err);
-      setError(err?.errors?.[0]?.message || 'Código incorrecto. Intente nuevamente.');
+      setError(err?.errors?.[0]?.message || 'Código incorrecto. Inténtalo de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -87,214 +92,102 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <InfoCard title="" variant="outlined" style={styles.card}>
-        <View style={styles.brandContainer}>
-          <Image
-            source={brandAssets.logoSvg}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          <Text style={styles.appTitle}>{brand.appTitleMedium}</Text>
-          <Text style={styles.tagline}>Panel de Administración de Proyectos</Text>
+      <BrandBackground withLines />
+      <ScrollView contentContainerStyle={[styles.scroll, wide && styles.scrollWide]} keyboardShouldPersistTaps="handled">
+        {/* Portada: como la del brandbook */}
+        {/* En celular todo va centrado; en pantallas anchas, portada a la izquierda y formulario a la derecha */}
+        <View style={[styles.cover, wide ? styles.coverWide : styles.centered]}>
+          <Reveal index={0}><Text style={[styles.kicker, !wide && styles.textCenter]}>/Producción/</Text></Reveal>
+          <Reveal index={1}><Text style={[styles.coverTitle, !wide && styles.textCenter]}>Portal de producción</Text></Reveal>
+          <Reveal index={2} style={!wide && styles.fullWidth}>
+            <Image source={brandAssets.logoOutline} style={[styles.outline, wide ? styles.outlineWide : styles.outlineCentered]} contentFit="contain" contentPosition={wide ? 'left' : 'center'} accessibilityLabel="Encuadre" />
+          </Reveal>
+          <Reveal index={3}><Text style={[styles.tagline, !wide && styles.textCenter]}>{brand.tagline}.</Text></Reveal>
         </View>
 
-        {error && (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>{error}</Text>
-          </View>
-        )}
+        <Reveal index={4} style={[styles.card, wide ? styles.cardWide : styles.cardCentered]}>
+          {error && (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          )}
 
-        {showMfa ? (
-          <View style={styles.form}>
-            <Text style={styles.mfaLabel}>Autenticación de 2 Factores</Text>
-            <Text style={styles.mfaInstructions}>
-              Hemos enviado un código de verificación a tu correo electrónico registrado.
-            </Text>
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Código de Verificación</Text>
-              <TextInput
+          {showMfa ? (
+            <View style={styles.form}>
+              <Text style={[styles.formTitle, !wide && styles.textCenter]}>Verificación en dos pasos</Text>
+              <Text style={[styles.formText, !wide && styles.textCenter]}>Te enviamos un código a tu correo.</Text>
+              <EncInput
+                label="Código de verificación"
                 value={mfaCode}
                 onChangeText={setMfaCode}
                 placeholder="123456"
-                placeholderTextColor={colors.onSurfaceAlpha38}
                 keyboardType="number-pad"
                 autoCapitalize="none"
-                style={[
-                  styles.input,
-                  Platform.OS === 'web' && { outlineStyle: 'none' } as any,
-                ]}
+                corner="lead"
               />
+              <ActionButton label="Verificar código" onPress={handleVerifyMfa} loading={loading} variant="filled" icon="check" style={styles.loginBtn} />
+              <ActionButton label="Volver" onPress={() => setShowMfa(false)} variant="text" />
             </View>
-
-            <ActionButton
-              label="Verificar Código"
-              onPress={handleVerifyMfa}
-              loading={loading}
-              variant="filled"
-              icon="check"
-              style={styles.loginBtn}
-            />
-
-            <ActionButton
-              label="Volver"
-              onPress={() => setShowMfa(false)}
-              variant="text"
-              style={{ marginTop: spacing.sm }}
-            />
-          </View>
-        ) : (
-          <View style={styles.form}>
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Correo electrónico</Text>
-              <TextInput
+          ) : (
+            <View style={styles.form}>
+              <Text style={[styles.formTitle, !wide && styles.textCenter]}>Iniciar sesión</Text>
+              <EncInput
+                label="Correo"
                 value={email}
                 onChangeText={setEmail}
-                placeholder="admin@encuadre.cl"
-                placeholderTextColor={colors.onSurfaceAlpha38}
+                placeholder="tu@correo.cl"
                 keyboardType="email-address"
                 autoCapitalize="none"
-                style={[
-                  styles.input,
-                  Platform.OS === 'web' && { outlineStyle: 'none' } as any,
-                ]}
+                corner="lead"
               />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Contraseña</Text>
-              <TextInput
+              <EncInput
+                label="Contraseña"
                 value={password}
                 onChangeText={setPassword}
                 placeholder="••••••••"
-                placeholderTextColor={colors.onSurfaceAlpha38}
                 secureTextEntry
                 autoCapitalize="none"
-                style={[
-                  styles.input,
-                  Platform.OS === 'web' && { outlineStyle: 'none' } as any,
-                ]}
+                onSubmitEditing={handleLogin}
               />
+              <ActionButton label="Entrar" onPress={handleLogin} loading={loading} variant="filled" icon="arrow-right" style={styles.loginBtn} />
             </View>
-
-            <ActionButton
-              label="Iniciar Sesión"
-              onPress={handleLogin}
-              loading={loading}
-              variant="filled"
-              icon="login"
-              style={styles.loginBtn}
-            />
-          </View>
-        )}
-
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>{brand.footer}</Text>
-        </View>
-      </InfoCard>
+          )}
+          <Text style={[styles.footerText, !wide && styles.textCenter]}>{brand.footer}</Text>
+        </Reveal>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: spacing.lg,
-  },
+  container: { flex: 1, backgroundColor: colors.background },
+  scroll: { flexGrow: 1, justifyContent: 'center', padding: spacing.lg, gap: spacing.xl },
+  scrollWide: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 96, gap: 64 },
+  cover: { gap: spacing.sm },
+  centered: { alignItems: 'center' },
+  textCenter: { textAlign: 'center' },
+  fullWidth: { width: '100%', alignItems: 'center' },
+  outlineCentered: { alignSelf: 'center' },
+  cardCentered: { alignSelf: 'center' },
+  coverWide: { flex: 1.3 },
+  kicker: { ...typography.labelLarge, fontWeight: '700', color: colors.onSurfaceVariant },
+  coverTitle: { ...typography.headlineSmall, fontWeight: '800', color: colors.onSurfaceVariant },
+  outline: { width: '100%', maxWidth: 360, aspectRatio: 5, marginVertical: spacing.sm },
+  outlineWide: { maxWidth: 620 },
+  tagline: { ...typography.titleLarge, fontWeight: '600', color: colors.onSurfaceVariant },
   card: {
-    width: '100%',
-    maxWidth: 420,
-    padding: spacing.lg,
-    backgroundColor: colors.surfaceContainerLow,
-    borderColor: colors.outlineVariant,
+    width: '100%', maxWidth: 440, alignSelf: 'flex-start',
+    padding: spacing.lg, gap: spacing.base,
+    backgroundColor: 'rgba(10, 10, 14, 0.72)', borderWidth: 1.5, borderColor: 'rgba(255, 255, 255, 0.18)',
+    ...corners.card,
+    ...Platform.select({ web: { backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' } as any }),
   },
-  brandContainer: {
-    alignItems: 'center',
-    marginBottom: spacing.xl,
-    gap: spacing.xs,
-  },
-  logo: {
-    width: 200,
-    height: 48,
-    ...Platform.select({
-      web: {
-        filter: 'brightness(0) invert(1)',
-      } as any,
-    }),
-  },
-  appTitle: {
-    ...typography.titleLarge,
-    color: colors.primary,
-    fontWeight: 'bold',
-    marginTop: spacing.sm,
-  },
-  tagline: {
-    ...typography.bodyMedium,
-    color: colors.onSurfaceVariant,
-    textAlign: 'center',
-  },
-  form: {
-    gap: spacing.base,
-  },
-  inputGroup: {
-    gap: spacing.xs,
-  },
-  label: {
-    ...typography.labelLarge,
-    color: colors.onSurface,
-    fontWeight: '600',
-  },
-  input: {
-    height: 48,
-    backgroundColor: colors.surfaceContainer,
-    borderRadius: shapes.small,
-    paddingHorizontal: spacing.base,
-    color: colors.onSurface,
-    borderWidth: 1,
-    borderColor: colors.outlineVariant,
-    ...typography.bodyLarge,
-  },
-  loginBtn: {
-    height: 48,
-    marginTop: spacing.sm,
-  },
-  errorContainer: {
-    backgroundColor: 'rgba(255, 180, 171, 0.15)',
-    borderWidth: 1,
-    borderColor: colors.error,
-    borderRadius: shapes.small,
-    padding: spacing.base,
-    marginBottom: spacing.base,
-  },
-  errorText: {
-    color: colors.error,
-    ...typography.bodyMedium,
-    textAlign: 'center',
-  },
-  footer: {
-    marginTop: spacing.xl,
-    borderTopWidth: 1,
-    borderTopColor: colors.outlineVariant,
-    paddingTop: spacing.base,
-    alignItems: 'center',
-  },
-  footerText: {
-    ...typography.bodySmall,
-    color: colors.onSurfaceVariant,
-  },
-  mfaLabel: {
-    ...typography.titleMedium,
-    color: colors.primary,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  mfaInstructions: {
-    ...typography.bodyMedium,
-    color: colors.onSurfaceVariant,
-    textAlign: 'center',
-    marginBottom: spacing.sm,
-    lineHeight: 20,
-  },
+  cardWide: { flex: 1, alignSelf: 'auto' },
+  form: { gap: spacing.base },
+  formTitle: { ...typography.headlineSmall, fontWeight: '900', color: colors.onSurface },
+  formText: { ...typography.bodyMedium, color: colors.onSurfaceVariant },
+  loginBtn: { height: 48, marginTop: spacing.xs },
+  errorContainer: { backgroundColor: 'rgba(255, 179, 192, 0.12)', borderWidth: 1.5, borderColor: colors.error, ...corners.chip, padding: spacing.md },
+  errorText: { ...typography.bodyMedium, color: colors.error },
+  footerText: { ...typography.bodySmall, color: colors.onSurfaceVariant, marginTop: spacing.sm },
 });

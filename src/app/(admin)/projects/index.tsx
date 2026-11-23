@@ -5,7 +5,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList } from 'react-native';
-import { colors, typography, shapes, spacing } from '@/theme/tokens';
+import { colors, typography, spacing, corners } from '@/theme/tokens';
+import { SectionHeader } from '@/components/brand/SectionHeader';
+import { Reveal } from '@/components/brand/Reveal';
 import { AppShell } from '@/components/m3/AppShell';
 import { ProjectCard } from '@/components/m3/ProjectCard';
 import { SearchField } from '@/components/m3/SearchField';
@@ -95,6 +97,7 @@ export default function ProjectsListScreen() {
   return (
     <AppShell title="Proyectos" rightActions={headerRight}>
       <View style={styles.container}>
+        <SectionHeader number={projects.length || '–'} title="Proyectos" subtitle="Producciones de Grupo Encuadre" size="large" />
         {/* Controles de Búsqueda y Filtro */}
         <View style={styles.controls}>
           <SearchField
@@ -124,13 +127,14 @@ export default function ProjectsListScreen() {
           />
         ) : (
           <View style={styles.grid}>
-            {filteredProjects.map((project) => (
-              <ProjectCard
-                key={project.id}
-                project={project}
-                onPress={() => router.push(`/projects/${project.id}`)}
-                style={styles.card}
-              />
+            {filteredProjects.map((project, index) => (
+              <Reveal key={project.id} index={Math.min(index, 8)} style={styles.card}>
+                <ProjectCard
+                  project={project}
+                  onPress={() => router.push(`/projects/${project.id}`)}
+                  style={{ flex: 1 }}
+                />
+              </Reveal>
             ))}
           </View>
         )}
@@ -147,8 +151,8 @@ const styles = StyleSheet.create({
     gap: spacing.base,
     backgroundColor: colors.surfaceContainerLow,
     padding: spacing.base,
-    borderRadius: shapes.medium,
-    borderWidth: 1,
+    ...corners.lead,
+    borderWidth: 1.5,
     borderColor: colors.outlineVariant,
   },
   search: {

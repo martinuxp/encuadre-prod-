@@ -3,9 +3,10 @@
 // ═══════════════════════════════════════════════════════
 
 import React from 'react';
-import { View, Text, StyleSheet, Image, Pressable, Platform, Animated } from 'react-native';
+import { View, Text, StyleSheet, Platform, Animated } from 'react-native';
+import { Image } from 'expo-image';
 import { colors, typography, layout, spacing } from '@/theme/tokens';
-import { brand, brandAssets } from '@/constants/brand';
+import { brandAssets } from '@/constants/brand';
 import { IconButton } from './IconButton';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -49,9 +50,11 @@ export const TopBar: React.FC<TopBarProps> = ({
           <View style={styles.logoContainer}>
             {/* Logo de Encuadre */}
             <Image
-              source={brandAssets.logoSvg}
+              source={brandAssets.logoReduced}
               style={styles.logo}
-              resizeMode="contain"
+              contentFit="contain"
+              contentPosition="left"
+              accessibilityLabel="Encuadre"
             />
           </View>
         )}
@@ -73,9 +76,11 @@ export const TopBar: React.FC<TopBarProps> = ({
 const styles = StyleSheet.create({
   topBar: {
     height: layout.topBarHeight,
-    backgroundColor: colors.surfaceContainerLow,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
     borderBottomWidth: 1,
     borderBottomColor: colors.outlineVariant,
+    zIndex: 2,
+    ...Platform.select({ web: { backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)' } as any }),
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -90,24 +95,19 @@ const styles = StyleSheet.create({
     marginRight: spacing.sm,
   },
   logoContainer: {
-    height: 32,
-    width: 140,
+    height: 22,
+    width: 104,
     justifyContent: 'center',
     marginRight: spacing.base,
   },
   logo: {
     height: '100%',
     width: '100%',
-    ...Platform.select({
-      web: {
-        filter: 'brightness(0) invert(1)', // Nos aseguramos que sea blanco en modo oscuro
-      } as any,
-    }),
   },
   title: {
     ...typography.titleLarge,
     color: colors.onSurface,
-    fontWeight: 'bold',
+    fontWeight: '900',
   },
   rightSection: {
     flexDirection: 'row',

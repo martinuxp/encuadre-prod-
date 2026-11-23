@@ -4,7 +4,7 @@
 
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ViewStyle, Pressable, Animated } from 'react-native';
-import { colors, typography, shapes, spacing } from '@/theme/tokens';
+import { colors, typography, spacing, corners } from '@/theme/tokens';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ease, duration } from '@/theme/animation';
 
@@ -78,7 +78,7 @@ export const SectionCard: React.FC<SectionCardProps> = ({
             )}
             <Text style={styles.title}>{title}</Text>
           </View>
-          {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+          {subtitle && <Text style={[styles.subtitle, collapsible && styles.subtitleIndented]}>{subtitle}</Text>}
         </View>
 
         {headerActions && <View style={styles.headerActions}>{headerActions}</View>}
@@ -91,10 +91,10 @@ export const SectionCard: React.FC<SectionCardProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surfaceContainerLowest,
-    borderWidth: 1,
+    backgroundColor: colors.surfaceContainerLow,
+    borderWidth: 1.5,
     borderColor: colors.outlineVariant,
-    borderRadius: shapes.large,
+    ...corners.card,
     overflow: 'hidden',
   },
   header: {
@@ -117,12 +117,15 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typography.titleLarge,
+    fontWeight: '900',
     color: colors.onSurface,
   },
   subtitle: {
     ...typography.bodyMedium,
     color: colors.onSurfaceVariant,
     marginTop: spacing.xs,
+  },
+  subtitleIndented: {
     marginLeft: spacing.lg,
   },
   headerActions: {

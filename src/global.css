@@ -1,3 +1,6 @@
+/* Google Sans Flex: única familia del panel (ejes opsz, wdth y wght) */
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wdth,wght@6..144,25..151,300..1000&display=swap');
+
 /* ═══════════════════════════════════════════════════════
    Encuadre Prod. — Global Styles + Material Design 3 Expressive (M3E)
    Dark Mode • Paleta y Animaciones Grupo Encuadre Chile
@@ -303,4 +306,73 @@ a:hover {
   src: url("/fonts/MaterialCommunityIcons.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   Marca Grupo Encuadre (brandbook + web pública)
+   Sobrescribe la paleta MD3 anterior: negro, blanco, noche y vino.
+   ═══════════════════════════════════════════════════════ */
+:root {
+  --enc-black: #000;
+  --enc-page: #060608;
+  --enc-night: #141a2e;
+  --enc-wine: #861634;
+  --enc-ink: #fff;
+  --enc-muted: rgba(255, 255, 255, .7);
+  --enc-sans: "Google Sans Flex", "Helvetica Neue", Arial, sans-serif;
+  --enc-ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --md-sys-typescale-font: var(--enc-sans);
+  --md-sys-color-primary: #fff;
+  --md-sys-color-on-primary: #000;
+  --md-sys-color-primary-container: rgba(255, 255, 255, .14);
+  --md-sys-color-on-primary-container: #fff;
+  --md-sys-color-background: #000;
+  --md-sys-color-surface: #060608;
+  --md-sys-color-on-surface: #fff;
+  --md-sys-color-on-surface-variant: rgba(255, 255, 255, .7);
+  --md-sys-color-outline: rgba(255, 255, 255, .3);
+  --md-sys-color-outline-variant: rgba(255, 255, 255, .12);
+  --md-sys-color-error: #ffb3c0;
+}
+
+html, body { font-family: var(--enc-sans); font-weight: 400; background: #000; color: #fff; }
+
+::selection { background: #fff; color: #000; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .18); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, .35); }
+
+/* Campos: el foco se marca con borde blanco (ver EncInput), sin el anillo azul del navegador */
+input:focus, textarea:focus { outline: none; }
+
+/* Fondo de marca: manchas noche (arriba-izq) y vino (abajo-der) que se mueven lento.
+   El grano va DENTRO del fondo, nunca encima del contenido. */
+.enc-bg { position: absolute; inset: 0; overflow: hidden; background: #000; pointer-events: none; z-index: 0; }
+.enc-bg__blobs { position: absolute; inset: -20%;
+  background:
+    radial-gradient(45% 55% at 85% 75%, rgba(134, 22, 52, .55), transparent 70%),
+    radial-gradient(45% 55% at 12% 12%, rgba(28, 34, 62, .9), transparent 70%);
+  animation: enc-drift 22s ease-in-out infinite alternate; will-change: transform; }
+.enc-bg--alt .enc-bg__blobs { background:
+    radial-gradient(45% 55% at 12% 90%, rgba(134, 22, 52, .4), transparent 70%),
+    radial-gradient(45% 55% at 88% 10%, rgba(28, 34, 62, .8), transparent 70%); }
+.enc-bg--quiet .enc-bg__blobs { opacity: .45; }
+.enc-bg__grain { position: absolute; inset: 0; background-size: 345px 115px; mix-blend-mode: soft-light; opacity: .55; }
+.enc-bg__lines { position: absolute; left: -10%; top: -40%; width: 130%; max-width: none; opacity: .3; }
+@keyframes enc-drift {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
+  50%  { transform: translate3d(3%, -2%, 0) rotate(4deg) scale(1.05); }
+  100% { transform: translate3d(-2%, 3%, 0) rotate(-3deg) scale(1.02); }
+}
+
+/* Entrada en cascada (opacidad + y + blur), usada por <Reveal /> en web */
+@keyframes enc-reveal {
+  from { opacity: 0; transform: translateY(24px); filter: blur(8px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enc-bg__blobs { animation: none; }
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }

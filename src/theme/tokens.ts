@@ -3,182 +3,155 @@
 // Mapeo de CSS custom properties a constantes TypeScript
 // ═══════════════════════════════════════════════════════
 
-/** Paleta de colores MD3 Dark — Grupo Encuadre */
+import { Platform } from 'react-native';
+
+/**
+ * Paleta Grupo Encuadre (brandbook): negro, blanco, noche y vino.
+ * Se conservan las claves MD3 para que todas las pantallas hereden la marca.
+ * Las superficies "Low/Lowest" son translúcidas (dejan ver el fondo de marca);
+ * "Container/High/Highest" son opacas porque se usan en diálogos y modales.
+ */
 export const colors = {
-  // Primary
-  primary: 'rgb(197, 192, 255)',
-  surfaceTint: 'rgb(197, 192, 255)',
-  onPrimary: 'rgb(45, 41, 96)',
-  primaryContainer: 'rgb(68, 64, 120)',
-  onPrimaryContainer: 'rgb(227, 223, 255)',
+  // Primary — blanco sobre negro
+  primary: '#FFFFFF',
+  surfaceTint: '#FFFFFF',
+  onPrimary: '#000000',
+  primaryContainer: 'rgba(255, 255, 255, 0.14)',
+  onPrimaryContainer: '#FFFFFF',
 
-  // Secondary
-  secondary: 'rgb(199, 196, 220)',
-  onSecondary: 'rgb(48, 46, 66)',
-  secondaryContainer: 'rgb(70, 69, 89)',
-  onSecondaryContainer: 'rgb(228, 223, 249)',
+  // Secondary — vino institucional
+  secondary: 'rgba(255, 255, 255, 0.7)',
+  onSecondary: '#000000',
+  secondaryContainer: '#861634',
+  onSecondaryContainer: '#FFFFFF',
 
-  // Tertiary
-  tertiary: 'rgb(235, 184, 208)',
-  onTertiary: 'rgb(71, 37, 56)',
-  tertiaryContainer: 'rgb(96, 59, 79)',
-  onTertiaryContainer: 'rgb(255, 216, 233)',
+  // Tertiary — noche
+  tertiary: '#AAB4E0',
+  onTertiary: '#0B0F1E',
+  tertiaryContainer: '#141A2E',
+  onTertiaryContainer: '#DDE2FF',
 
   // Error
-  error: 'rgb(255, 180, 171)',
-  onError: 'rgb(105, 0, 5)',
-  errorContainer: 'rgb(147, 0, 10)',
-  onErrorContainer: 'rgb(255, 218, 214)',
+  error: '#FFB3C0',
+  onError: '#3D0010',
+  errorContainer: '#5C0F22',
+  onErrorContainer: '#FFD9DF',
 
   // Surface / Background
-  background: 'rgb(19, 19, 24)',
-  onBackground: 'rgb(229, 225, 233)',
-  surface: 'rgb(19, 19, 24)',
-  onSurface: 'rgb(229, 225, 233)',
-  surfaceVariant: 'rgb(71, 70, 79)',
-  onSurfaceVariant: 'rgb(200, 197, 208)',
+  background: '#000000',
+  onBackground: '#FFFFFF',
+  surface: '#060608',
+  onSurface: '#FFFFFF',
+  surfaceVariant: 'rgba(255, 255, 255, 0.08)',
+  onSurfaceVariant: 'rgba(255, 255, 255, 0.7)',
 
-  // Outline
-  outline: 'rgb(146, 143, 153)',
-  outlineVariant: 'rgb(71, 70, 79)',
+  // Outline — bordes blancos finos
+  outline: 'rgba(255, 255, 255, 0.3)',
+  outlineVariant: 'rgba(255, 255, 255, 0.12)',
 
-  // Shadow / Scrim
-  shadow: 'rgb(0, 0, 0)',
-  scrim: 'rgb(0, 0, 0)',
+  // Misc
+  shadow: '#000000',
+  scrim: '#000000',
 
   // Inverse
-  inverseSurface: 'rgb(229, 225, 233)',
-  inverseOnSurface: 'rgb(49, 48, 54)',
-  inversePrimary: 'rgb(92, 88, 145)',
+  inverseSurface: '#FFFFFF',
+  inverseOnSurface: '#000000',
+  inversePrimary: '#861634',
 
-  // Surface Containers (elevación tonal MD3)
-  surfaceDim: 'rgb(19, 19, 24)',
-  surfaceBright: 'rgb(58, 56, 63)',
-  surfaceContainerLowest: 'rgb(14, 14, 19)',
-  surfaceContainerLow: 'rgb(28, 27, 32)',
-  surfaceContainer: 'rgb(32, 31, 37)',
-  surfaceContainerHigh: 'rgb(42, 41, 47)',
-  surfaceContainerHighest: 'rgb(53, 52, 58)',
+  // Surface Containers
+  surfaceDim: '#000000',
+  surfaceBright: '#2A2A2E',
+  surfaceContainerLowest: 'rgba(255, 255, 255, 0.03)',
+  surfaceContainerLow: 'rgba(255, 255, 255, 0.05)',
+  surfaceContainer: '#111114',
+  surfaceContainerHigh: '#18181C',
+  surfaceContainerHighest: '#222227',
 
-  // Semánticos (producción)
+  // Estados
   success: 'rgb(129, 199, 132)',
   onSuccess: 'rgb(27, 60, 29)',
   warning: 'rgb(255, 213, 79)',
   onWarning: 'rgb(62, 49, 0)',
 
-  // Transparencias útiles
-  primaryAlpha12: 'rgba(197, 192, 255, 0.12)',
-  primaryAlpha20: 'rgba(197, 192, 255, 0.20)',
-  onSurfaceAlpha08: 'rgba(229, 225, 233, 0.08)',
-  onSurfaceAlpha12: 'rgba(229, 225, 233, 0.12)',
-  onSurfaceAlpha38: 'rgba(229, 225, 233, 0.38)',
+  // Alfas
+  primaryAlpha12: 'rgba(255, 255, 255, 0.12)',
+  primaryAlpha20: 'rgba(255, 255, 255, 0.20)',
+  onSurfaceAlpha08: 'rgba(255, 255, 255, 0.08)',
+  onSurfaceAlpha12: 'rgba(255, 255, 255, 0.12)',
+  onSurfaceAlpha38: 'rgba(255, 255, 255, 0.38)',
   scrimAlpha32: 'rgba(0, 0, 0, 0.32)',
 } as const;
 
-/** Tipografía MD3 */
-export const typography = {
-  displayLarge: {
-    fontSize: 57,
-    lineHeight: 64,
-    fontWeight: '400' as const,
-    letterSpacing: -0.25,
-  },
-  displayMedium: {
-    fontSize: 45,
-    lineHeight: 52,
-    fontWeight: '400' as const,
-    letterSpacing: 0,
-  },
-  displaySmall: {
-    fontSize: 36,
-    lineHeight: 44,
-    fontWeight: '400' as const,
-    letterSpacing: 0,
-  },
-  headlineLarge: {
-    fontSize: 32,
-    lineHeight: 40,
-    fontWeight: '400' as const,
-    letterSpacing: 0,
-  },
-  headlineMedium: {
-    fontSize: 28,
-    lineHeight: 36,
-    fontWeight: '400' as const,
-    letterSpacing: 0,
-  },
-  headlineSmall: {
-    fontSize: 24,
-    lineHeight: 32,
-    fontWeight: '400' as const,
-    letterSpacing: 0,
-  },
-  titleLarge: {
-    fontSize: 22,
-    lineHeight: 28,
-    fontWeight: '500' as const,
-    letterSpacing: 0,
-  },
-  titleMedium: {
-    fontSize: 16,
-    lineHeight: 24,
-    fontWeight: '500' as const,
-    letterSpacing: 0.15,
-  },
-  titleSmall: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: '500' as const,
-    letterSpacing: 0.1,
-  },
-  bodyLarge: {
-    fontSize: 16,
-    lineHeight: 24,
-    fontWeight: '400' as const,
-    letterSpacing: 0.5,
-  },
-  bodyMedium: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: '400' as const,
-    letterSpacing: 0.25,
-  },
-  bodySmall: {
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: '400' as const,
-    letterSpacing: 0.4,
-  },
-  labelLarge: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: '500' as const,
-    letterSpacing: 0.1,
-  },
-  labelMedium: {
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: '500' as const,
-    letterSpacing: 0.5,
-  },
-  labelSmall: {
-    fontSize: 11,
-    lineHeight: 16,
-    fontWeight: '500' as const,
-    letterSpacing: 0.5,
-  },
+/** Tokens propios de la marca (ver docs/GUIA-DISENO-ENCUADRE.md de la web) */
+export const brandColors = {
+  black: '#000000',
+  page: '#060608',
+  night: '#141A2E',
+  wine: '#861634',
+  ink: '#FFFFFF',
+  muted: 'rgba(255, 255, 255, 0.7)',
+  surface: 'rgba(255, 255, 255, 0.06)',
+  surfaceHover: 'rgba(255, 255, 255, 0.12)',
+  line: 'rgba(255, 255, 255, 0.25)',
+  lineSoft: 'rgba(255, 255, 255, 0.12)',
+  glass: 'rgba(10, 10, 14, 0.82)',
 } as const;
 
-/** Formas MD3 (border radius) */
+/** Única familia del panel: Google Sans Flex (cargada en web desde global.css) */
+export const fontFamily = Platform.select({
+  web: '"Google Sans Flex", "Helvetica Neue", Arial, sans-serif',
+  default: undefined,
+});
+
+/** Tipografía — Google Sans Flex, pesos altos y tracking negativo en títulos */
+const t = (fontSize: number, lineHeight: number, fontWeight: '300' | '400' | '500' | '600' | '700' | '800' | '900', letterSpacing: number) =>
+  ({ fontFamily, fontSize, lineHeight, fontWeight, letterSpacing }) as const;
+
+export const typography = {
+  displayLarge: t(57, 60, '900', -2.5),
+  displayMedium: t(45, 48, '900', -1.8),
+  displaySmall: t(36, 40, '900', -1.4),
+  headlineLarge: t(32, 36, '800', -1.1),
+  headlineMedium: t(28, 32, '800', -0.9),
+  headlineSmall: t(24, 28, '800', -0.7),
+  titleLarge: t(22, 26, '700', -0.5),
+  titleMedium: t(16, 22, '700', -0.2),
+  titleSmall: t(14, 20, '700', -0.1),
+  bodyLarge: t(16, 24, '400', -0.1),
+  bodyMedium: t(14, 20, '400', 0),
+  bodySmall: t(12, 16, '400', 0.1),
+  labelLarge: t(14, 20, '700', 0),
+  labelMedium: t(12, 16, '700', 0.2),
+  labelSmall: t(11, 16, '700', 0.6),
+} as const;
+
+/** Formas — radio base 10 y la firma del brandbook: una esquina grande por bloque */
 export const shapes = {
   none: 0,
-  extraSmall: 4,
-  small: 8,
-  medium: 12,
-  large: 16,
+  extraSmall: 6,
+  small: 10,
+  medium: 10,
+  large: 14,
   largeIncreased: 20,
-  extraLarge: 28,
+  extraLarge: 30,
+  signature: 30,
   full: 9999,
+} as const;
+
+/** Esquinas de firma listas para usar en estilos */
+export const corners = {
+  /** Tarjetas y bloques: 10 30 10 10 */
+  card: { borderRadius: 10, borderTopRightRadius: 30 },
+  /** Primer bloque de un grupo / hero */
+  lead: { borderRadius: 10, borderTopLeftRadius: 30 },
+  /** Último bloque de un grupo */
+  tail: { borderRadius: 10, borderBottomRightRadius: 30 },
+  /** Botones: esquina superior izquierda 24 */
+  button: { borderRadius: 10, borderTopLeftRadius: 24 },
+  /** Chips / etiquetas: 10 20 10 10 */
+  chip: { borderRadius: 10, borderTopRightRadius: 20 },
+  /** Campos de formulario */
+  field: { borderRadius: 10 },
 } as const;
 
 /** Espaciado (sistema de 8dp) */

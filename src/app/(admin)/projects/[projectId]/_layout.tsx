@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, Platform } from 'react-native';
 import { Slot, useLocalSearchParams, useRouter, usePathname } from 'expo-router';
-import { colors, typography, shapes, spacing } from '@/theme/tokens';
+import { colors, typography, shapes, spacing, corners } from '@/theme/tokens';
 import { AppShell } from '@/components/m3/AppShell';
 import { projectService } from '@/services/firebase/projectService';
 import { Project } from '@/types';
@@ -72,6 +72,7 @@ export default function ProjectDetailLayout() {
   };
 
   const activeTab = getActiveTab();
+  const tint = project.web?.colors;
 
   const handleTabSelect = (tabKey: string) => {
     if (tabKey === '') {
@@ -99,13 +100,13 @@ export default function ProjectDetailLayout() {
       onBackPress={() => router.replace('/projects')}
     >
       <View style={styles.container}>
-        {/* Cabecera del Proyecto */}
-        <View style={styles.header}>
+        {/* Cabecera del proyecto: se tiñe con los colores de su ficha web (paleta croma-adaptativa) */}
+        <View style={[styles.header, tint && { backgroundColor: tint.bg, borderColor: 'transparent' }]}>
           <View style={styles.titleCol}>
-            <Text style={styles.projectName}>{project.name}</Text>
-            <Text style={styles.projectSubtitle}>
-              {project.type.toUpperCase()} • ID: {project.id.substring(0, 8)}
+            <Text style={[styles.projectSubtitle, tint && { color: tint.ink }]}>
+              {project.web?.kind || project.type.replace('_', ' ')} · {project.id.substring(0, 8)}
             </Text>
+            <Text style={[styles.projectName, tint && { color: tint.ink }]}>{project.name}</Text>
           </View>
           <StatusChip
             label={project.status.replace('_', ' ').toUpperCase()}
@@ -120,7 +121,7 @@ export default function ProjectDetailLayout() {
           style={styles.tabBar}
           contentContainerStyle={styles.tabBarContent}
         >
-          {tabs.map((tab) => {
+          {tabs.map((tab, index) => {
             const isActive = tab.key === activeTab;
             return (
               <Pressable
@@ -128,13 +129,15 @@ export default function ProjectDetailLayout() {
                 onPress={() => handleTabSelect(tab.key)}
                 style={[
                   styles.tab,
+                  index === 0 && styles.tabFirst,
+                  index === tabs.length - 1 && styles.tabLast,
                   isActive ? styles.tabActive : styles.tabInactive,
                 ]}
               >
                 <MaterialCommunityIcons
                   name={tab.icon as any}
                   size={18}
-                  color={isActive ? colors.primary : colors.onSurfaceVariant}
+                  color={isActive ? '#000000' : colors.onSurfaceVariant}
                 />
                 <Text
                   style={[
@@ -173,31 +176,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: colors.surfaceContainerLow,
-    padding: spacing.base,
-    borderRadius: shapes.medium,
-    borderWidth: 1,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    ...corners.card,
+    borderWidth: 1.5,
     borderColor: colors.outlineVariant,
+    ...Platform.select({ web: { transition: 'background-color 600ms cubic-bezier(0.16, 1, 0.3, 1)' } as any }),
   },
   titleCol: {
     flex: 1,
     gap: spacing.xs,
   },
   projectName: {
-    ...typography.headlineSmall,
+    ...typography.headlineLarge,
+    fontWeight: '900',
     color: colors.onSurface,
-    fontWeight: 'bold',
   },
   projectSubtitle: {
-    ...typography.bodySmall,
+    ...typography.labelMedium,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
     color: colors.onSurfaceVariant,
+    opacity: 0.85,
   },
   tabBar: {
     maxHeight: 48,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.outlineVariant,
   },
   tabBarContent: {
-    gap: spacing.base,
+    gap: spacing.xs + 2,
     paddingBottom: spacing.xs,
   },
   tab: {
@@ -206,28 +212,32 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     paddingHorizontal: spacing.base,
     paddingVertical: spacing.sm,
-    borderBottomWidth: 3,
-    borderBottomColor: 'transparent',
-    borderRadius: shapes.extraSmall,
+    borderRadius: shapes.small,
+    borderWidth: 1,
     ...Platform.select({
       web: {
         cursor: 'pointer',
-        transition: 'all 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+        transition: 'background-color 400ms cubic-bezier(0.16, 1, 0.3, 1), color 400ms cubic-bezier(0.16, 1, 0.3, 1)',
       } as any,
     }),
   },
+  tabFirst: { borderTopLeftRadius: 20 },
+  tabLast: { borderTopRightRadius: 20 },
   tabActive: {
-    borderBottomColor: colors.primary,
-    backgroundColor: 'rgba(197, 192, 255, 0.08)',
+    backgroundColor: '#FFFFFF',
+    borderColor: '#FFFFFF',
   },
-  tabInactive: {},
+  tabInactive: {
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+  },
   tabLabel: {
     ...typography.labelLarge,
     fontWeight: '600',
   },
   tabLabelActive: {
-    color: colors.primary,
-    fontWeight: 'bold',
+    color: '#000000',
+    fontWeight: '800',
   },
   tabLabelInactive: {
     color: colors.onSurfaceVariant,

@@ -46,7 +46,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
               <MaterialCommunityIcons
                 name={(isActive ? item.activeIcon || item.icon : item.icon) as any}
                 size={24}
-                color={isActive ? colors.onPrimaryContainer : colors.onSurfaceVariant}
+                color={isActive ? '#000000' : colors.onSurfaceVariant}
               />
               {item.badge !== undefined && item.badge > 0 && (
                 <View style={styles.badge}>
@@ -73,7 +73,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
 const styles = StyleSheet.create({
   bar: {
     height: layout.bottomNavHeight,
-    backgroundColor: colors.surfaceContainer,
+    backgroundColor: 'rgba(6, 6, 8, 0.92)',
     borderTopWidth: 1,
     borderTopColor: colors.outlineVariant,
     flexDirection: 'row',
@@ -90,18 +90,19 @@ const styles = StyleSheet.create({
   iconContainer: {
     width: 64,
     height: 32,
-    borderRadius: shapes.large,
+    borderRadius: shapes.small,
+    borderTopLeftRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
     ...Platform.select({
       web: {
-        transition: 'transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 200ms cubic-bezier(0.2, 0, 0, 1)',
+        transition: 'transform 300ms cubic-bezier(0.16, 1, 0.3, 1), background-color 300ms cubic-bezier(0.16, 1, 0.3, 1)',
       } as any,
     }),
   },
   iconContainerActive: {
-    backgroundColor: colors.primaryContainer,
+    backgroundColor: '#FFFFFF',
   },
   iconContainerInactive: {
     backgroundColor: 'transparent',

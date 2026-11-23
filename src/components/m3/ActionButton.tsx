@@ -14,7 +14,7 @@ import {
   Platform,
   StyleProp,
 } from 'react-native';
-import { colors, typography, shapes, spacing } from '@/theme/tokens';
+import { colors, typography, spacing, corners } from '@/theme/tokens';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ease, duration, scale } from '@/theme/animation';
 
@@ -29,6 +29,8 @@ interface ActionButtonProps {
   loading?: boolean;
   style?: StyleProp<ViewStyle>;
   labelStyle?: TextStyle;
+  /** Colores del proyecto: el botón se pinta con `ink` sobre `bg` (vistas teñidas) */
+  tint?: { bg: string; ink: string };
 }
 
 export const ActionButton: React.FC<ActionButtonProps> = ({
@@ -40,52 +42,37 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
   loading = false,
   style,
   labelStyle,
+  tint,
 }) => {
+  const ink = tint?.ink ?? colors.onSurface;
+  const paper = tint?.bg ?? colors.background;
+  // Principal: blanco con texto negro. Secundario: borde blanco 2 px. Tonal: superficie translúcida.
   const getVariantStyles = (): { container: ViewStyle; text: TextStyle; iconColor: string } => {
     switch (variant) {
       case 'tonal':
         return {
-          container: {
-            backgroundColor: colors.secondaryContainer,
-          },
-          text: {
-            color: colors.onSecondaryContainer,
-          },
-          iconColor: colors.onSecondaryContainer,
+          container: { backgroundColor: 'rgba(255, 255, 255, 0.08)', borderWidth: 1.5, borderColor: tint ? ink : colors.outlineVariant },
+          text: { color: ink },
+          iconColor: ink,
         };
       case 'outlined':
         return {
-          container: {
-            backgroundColor: 'transparent',
-            borderWidth: 1,
-            borderColor: colors.outline,
-          },
-          text: {
-            color: colors.primary,
-          },
-          iconColor: colors.primary,
+          container: { backgroundColor: 'transparent', borderWidth: 2, borderColor: ink },
+          text: { color: ink },
+          iconColor: ink,
         };
       case 'text':
         return {
-          container: {
-            backgroundColor: 'transparent',
-            paddingHorizontal: spacing.sm,
-          },
-          text: {
-            color: colors.primary,
-          },
-          iconColor: colors.primary,
+          container: { backgroundColor: 'transparent', paddingHorizontal: spacing.sm },
+          text: { color: ink },
+          iconColor: ink,
         };
       case 'filled':
       default:
         return {
-          container: {
-            backgroundColor: colors.primary,
-          },
-          text: {
-            color: colors.onPrimary,
-          },
-          iconColor: colors.onPrimary,
+          container: { backgroundColor: ink, borderWidth: 2, borderColor: ink },
+          text: { color: paper },
+          iconColor: paper,
         };
     }
   };
@@ -115,7 +102,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
         disabled && styles.disabled,
         Platform.OS === 'web' && ({
           cursor: disabled || loading ? 'not-allowed' : 'pointer',
-          transition: 'transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 200ms cubic-bezier(0.2, 0, 0, 1), opacity 150ms ease',
+          transition: 'transform 250ms cubic-bezier(0.16, 1, 0.3, 1), background-color 200ms ease, opacity 150ms ease',
         } as any),
         style as any,
       ]}
@@ -161,8 +148,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: spacing.base,
-    borderRadius: shapes.full,
+    paddingHorizontal: spacing.base + 4,
+    ...corners.button,
   },
   inner: {
     flexDirection: 'row',
@@ -172,7 +159,7 @@ const styles = StyleSheet.create({
   text: {
     ...typography.labelLarge,
     textAlign: 'center',
-    fontWeight: '600',
+    fontWeight: '700',
   },
   icon: {
     marginRight: spacing.sm,
@@ -184,11 +171,7 @@ const styles = StyleSheet.create({
     opacity: 0.85,
   },
   disabled: {
-    backgroundColor: colors.surfaceContainerLow,
-    borderColor: colors.outlineVariant,
     opacity: 0.38,
   },
-  disabledText: {
-    color: colors.onSurface,
-  },
+  disabledText: {},
 });

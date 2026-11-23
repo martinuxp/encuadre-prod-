@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
-import { colors, typography, shapes, spacing } from '@/theme/tokens';
+import { colors, typography, spacing, corners } from '@/theme/tokens';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export type StatusType =
@@ -20,6 +20,8 @@ interface StatusChipProps {
   icon?: keyof typeof MaterialCommunityIcons.glyphMap;
   style?: ViewStyle;
   labelStyle?: TextStyle;
+  /** Color de texto del proyecto: el chip se dibuja con ese color (vistas teñidas) */
+  ink?: string;
 }
 
 export const StatusChip: React.FC<StatusChipProps> = ({
@@ -28,6 +30,7 @@ export const StatusChip: React.FC<StatusChipProps> = ({
   icon,
   style,
   labelStyle,
+  ink,
 }) => {
   const getStatusStyles = (): { bg: string; text: string; border?: string } => {
     switch (status) {
@@ -48,27 +51,27 @@ export const StatusChip: React.FC<StatusChipProps> = ({
         };
       case 'info':
         return {
-          bg: colors.primaryAlpha12,
-          text: colors.primary,
+          bg: '#FFFFFF',
+          text: '#000000',
         };
       case 'default':
       default:
         return {
-          bg: colors.surfaceContainerHigh,
+          bg: 'rgba(255, 255, 255, 0.08)',
           text: colors.onSurfaceVariant,
           border: colors.outlineVariant,
         };
     }
   };
 
-  const sStyles = getStatusStyles();
+  const sStyles = ink ? { bg: 'transparent', text: ink, border: ink } : getStatusStyles();
 
   return (
     <View
       style={[
         styles.chip,
         { backgroundColor: sStyles.bg },
-        sStyles.border ? { borderWidth: 1, borderColor: sStyles.border } : null,
+        sStyles.border ? { borderWidth: ink ? 1.5 : 1, borderColor: sStyles.border } : null,
         style,
       ]}
     >
@@ -92,13 +95,14 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
-    height: 28,
-    paddingHorizontal: spacing.sm,
-    borderRadius: shapes.full,
+    height: 26,
+    paddingHorizontal: spacing.md,
+    ...corners.chip,
   },
   label: {
     ...typography.labelMedium,
-    fontWeight: '600',
+    fontWeight: '900',
+    letterSpacing: 0.3,
   },
   icon: {
     marginRight: spacing.xs,

@@ -69,31 +69,32 @@ const styles = StyleSheet.create({
   chip: {
     height: 34,
     paddingHorizontal: spacing.base,
-    borderRadius: shapes.full,
+    borderRadius: shapes.small,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
     ...Platform.select({
       web: {
         cursor: 'pointer',
-        transition: 'transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 200ms cubic-bezier(0.2, 0, 0, 1), border-color 200ms cubic-bezier(0.2, 0, 0, 1)',
+        transition: 'background-color 300ms cubic-bezier(0.16, 1, 0.3, 1), color 300ms cubic-bezier(0.16, 1, 0.3, 1)',
       } as any,
     }),
   },
   chipSelected: {
-    backgroundColor: colors.primaryContainer,
-    borderColor: colors.primary,
+    backgroundColor: '#FFFFFF',
+    borderColor: '#FFFFFF',
   },
   chipUnselected: {
-    backgroundColor: colors.surfaceContainerLow,
-    borderColor: colors.outlineVariant,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(255, 255, 255, 0.12)',
   },
   label: {
     ...typography.labelLarge,
     fontWeight: '600',
   },
   labelSelected: {
-    color: colors.onPrimaryContainer,
+    color: '#000000',
+    fontWeight: '800',
   },
   labelUnselected: {
     color: colors.onSurfaceVariant,

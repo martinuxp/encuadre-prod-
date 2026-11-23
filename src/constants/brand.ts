@@ -13,6 +13,8 @@ export const brand = {
   appTitleShort: 'Encuadre Prod.',
   /** Nombre corporativo completo */
   companyFull: 'Grupo Encuadre Chile',
+  /** Descripción corta (tono: "grupo", no "colectivo") */
+  tagline: 'Grupo de cine independiente en Chile',
   /** Nombre corporativo medio */
   companyMedium: 'Grupo Encuadre',
   /** Nombre corporativo corto */
@@ -26,4 +28,12 @@ export const brand = {
 /** Paths de activos de marca */
 export const brandAssets = {
   logoSvg: require('../../assets/brand-svg/Encuadrelogo.svg'),
+  /** ENCDRE en blanco: barra superior y usos chicos */
+  logoReduced: require('../../assets/brand/logo/reduced-white.svg'),
+  /** Logo principal en blanco */
+  logoMinimal: require('../../assets/brand/logo/minimal-white.svg'),
+  /** Logo completo en blanco */
+  logoFull: require('../../assets/brand/logo/full-white.svg'),
+  /** Logo en contorno de la portada del brandbook */
+  logoOutline: require('../../assets/brand/logo-outline.svg'),
 } as const;

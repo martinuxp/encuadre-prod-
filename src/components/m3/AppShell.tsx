@@ -10,6 +10,7 @@ import { NavigationItem } from '@/types';
 import { TopBar } from './TopBar';
 import { NavigationRail } from './NavigationRail';
 import { BottomNavigation } from './BottomNavigation';
+import { BrandBackground } from '@/components/brand/BrandBackground';
 import { useRouter, usePathname } from 'expo-router';
 
 interface AppShellProps {
@@ -18,6 +19,8 @@ interface AppShellProps {
   onBackPress?: () => void;
   rightActions?: React.ReactNode;
   children: React.ReactNode;
+  /** Fondo de marca: `brand` (portada/inicio), `quiet` (por defecto, atenuado) o `plain` (#060608 liso) */
+  background?: 'brand' | 'quiet' | 'plain';
 }
 
 export const AppShell: React.FC<AppShellProps> = ({
@@ -26,6 +29,7 @@ export const AppShell: React.FC<AppShellProps> = ({
   onBackPress,
   rightActions,
   children,
+  background = 'quiet',
 }) => {
   const responsive = useResponsive();
   const router = useRouter();
@@ -63,7 +67,8 @@ export const AppShell: React.FC<AppShellProps> = ({
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+      <View style={[styles.container, background === 'plain' && styles.plain]}>
+        {background !== 'plain' && <BrandBackground variant={background === 'brand' ? 'default' : 'quiet'} />}
         {/* TopBar en la cabecera */}
         <TopBar
           title={title}
@@ -121,6 +126,10 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     backgroundColor: colors.background,
+    position: 'relative',
+  },
+  plain: {
+    backgroundColor: colors.surface,
   },
   body: {
     flex: 1,
@@ -129,7 +138,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: 'transparent',
   },
   contentContainer: {
     padding: 24,

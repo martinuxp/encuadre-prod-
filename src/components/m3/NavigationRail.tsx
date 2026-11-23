@@ -49,7 +49,7 @@ export const NavigationRail: React.FC<NavigationRailProps> = ({
                 <MaterialCommunityIcons
                   name={(isActive ? item.activeIcon || item.icon : item.icon) as any}
                   size={24}
-                  color={isActive ? colors.onPrimaryContainer : colors.onSurfaceVariant}
+                  color={isActive ? '#000000' : colors.onSurfaceVariant}
                 />
                 {item.badge !== undefined && item.badge > 0 && (
                   <View style={styles.badge}>
@@ -87,7 +87,7 @@ export const NavigationRail: React.FC<NavigationRailProps> = ({
 const styles = StyleSheet.create({
   rail: {
     width: layout.navRailWidth,
-    backgroundColor: colors.surfaceContainerLow,
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
     borderRightWidth: 1,
     borderRightColor: colors.outlineVariant,
     alignItems: 'center',
@@ -108,18 +108,19 @@ const styles = StyleSheet.create({
   iconContainer: {
     width: 56,
     height: 32,
-    borderRadius: shapes.large,
+    borderRadius: shapes.small,
+    borderTopLeftRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
     ...Platform.select({
       web: {
-        transition: 'transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1), background-color 200ms cubic-bezier(0.2, 0, 0, 1)',
+        transition: 'transform 300ms cubic-bezier(0.16, 1, 0.3, 1), background-color 300ms cubic-bezier(0.16, 1, 0.3, 1)',
       } as any,
     }),
   },
   iconContainerActive: {
-    backgroundColor: colors.primaryContainer,
+    backgroundColor: '#FFFFFF',
   },
   iconContainerInactive: {
     backgroundColor: 'transparent',
