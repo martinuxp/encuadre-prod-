@@ -35,5 +35,5 @@ export const brandAssets = {
   /** Logo completo en blanco */
   logoFull: require('../../assets/brand/logo/full-white.svg'),
   /** Logo en contorno de la portada del brandbook */
-  logoOutline: require('../../assets/brand/logo-outline.svg'),
+  logoOutline: require('../../assets/brand/logo-outline-clean.svg'),
 } as const;
